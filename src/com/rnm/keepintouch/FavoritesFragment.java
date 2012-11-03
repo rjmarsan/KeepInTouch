@@ -2,7 +2,9 @@ package com.rnm.keepintouch;
 
 import java.util.List;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +15,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.rnm.keepintouch.data.Contact;
+import com.rnm.keepintouch.data.ContactEvent;
+import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
 public class FavoritesFragment extends Fragment implements OnItemClickListener {
 	
@@ -41,6 +45,22 @@ public class FavoritesFragment extends Fragment implements OnItemClickListener {
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		
+		Contact contact = contactsAdapter.getItem(arg2);
+		ContactEvent latest = contact.getLatest();
+		if (latest == null || latest.type == TYPE.SMS) {
+			sendSms(contact, latest);
+		} else {
+			sendCall(contact, latest);
+		}
+	}
+	
+	private void sendSms(Contact contact, ContactEvent event) {
+		String number = (event != null) ? event.number : contact.phonenumber.get(0); 
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + number)));
+	}
+	
+	private void sendCall(Contact contact, ContactEvent event) {
+		String number = (event != null) ? event.number : contact.phonenumber.get(0); 
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number)));
 	}
 }

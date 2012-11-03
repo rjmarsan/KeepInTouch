@@ -13,6 +13,7 @@ public class ContactEvent {
 	
 	public TYPE type;
 	public long timestamp;
+	public String number;
 	public int callType;
 	public String message;
 }

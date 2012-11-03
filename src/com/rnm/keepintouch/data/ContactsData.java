@@ -150,6 +150,7 @@ public class ContactsData {
 	               event.type = TYPE.CALL;
 	               event.timestamp = timestamp;
 	               event.callType = type;
+	               event.number = num;
 	               
 	               target.contactEvents.add(event);
 	               if (event.timestamp > target.lastcontact) {
@@ -176,6 +177,7 @@ public class ContactsData {
 					event.type = TYPE.SMS;
 					event.timestamp = timestamp;
 					event.message = body;
+					event.number = number;
 					
 					target.contactEvents.add(event);
 					if (event.timestamp > target.lastcontact) {

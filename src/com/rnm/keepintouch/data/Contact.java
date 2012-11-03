@@ -1,9 +1,9 @@
 package com.rnm.keepintouch.data;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
+import android.net.Uri;
 
 public class Contact {
 	public String name;
@@ -11,6 +11,7 @@ public class Contact {
 	public List<String> phonenumber = new ArrayList<String>();
 	long lastcontact = Long.MIN_VALUE;
 	public List<ContactEvent> contactEvents = new ArrayList<ContactEvent>();
+	public Uri uri;
 	
 	private static final int MILLIS_IN_DAY = 24*60*60*1000;
 	
@@ -26,8 +27,8 @@ public class Contact {
 		if (contactEvents.isEmpty()) return null;
 		ContactEvent mostrecent = contactEvents.get(0);
 		for (ContactEvent event : contactEvents) {
-			if (mostrecent.timestamp < event.timestamp) {
-				event = mostrecent;
+			if (event.timestamp > mostrecent.timestamp) {
+				mostrecent = event;
 			}
 		}
 		return mostrecent;

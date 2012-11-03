@@ -1,80 +1,50 @@
 package com.rnm.keepintouch;
 
+import java.io.InputStream;
 import java.util.List;
 
 import android.content.Context;
-import android.database.DataSetObserver;
+import android.graphics.BitmapFactory;
 import android.provider.ContactsContract;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.QuickContactBadge;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rnm.keepintouch.data.Contact;
 import com.rnm.keepintouch.data.ContactEvent;
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
-public class ContactsAdapter implements ListAdapter{
+public class ContactsAdapter extends ArrayAdapter<Contact> {
 	
-	private List<Contact> contacts;
-	private Context context;
-	
-	public ContactsAdapter(Context context){
-		this.contacts = null;
-		this.context = context;
-	}
-	
-	public ContactsAdapter(List<Contact> contacts, Context context){
-		this.contacts = contacts;
-		this.context = context;
-	}
-
-	@Override
-	public int getCount() {
-		if(contacts!= null){
-			return contacts.size();
-		}
-		return 0;
-	}
-
-	@Override
-	public Object getItem(int position) {
-		if(contacts!= null){
-			return contacts.get(position);
-		}
-		return null;
-	}
-
-	@Override
-	public long getItemId(int position) {
-		if(contacts!= null){
-			return contacts.get(position).hashCode();
-		}
-		return -1;
-	}
-
-	@Override
-	public int getItemViewType(int arg0) {
-		// TODO Auto-generated method stub
-		return 0;
+	public ContactsAdapter(Context context, int textViewResourceId, List<Contact> objects) {
+		super(context, textViewResourceId, objects);
 	}
 
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		final Contact contact = (Contact) getItem(position);
 		if(view == null){
-			LayoutInflater inf = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater inf = LayoutInflater.from(getContext());
 			
 			view = inf.inflate(R.layout.contact_list_item, null);
 		}
 		
+		Log.d("ContactsAdapter", "Making badge " + contact.name);
 		
-		QuickContactBadge badge = (QuickContactBadge)view.findViewById(R.id.contacted_badge);
-		badge.assignContactFromPhone(contact.phonenumber.get(0), false);
-        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
+//		QuickContactBadge badge = (QuickContactBadge)view.findViewById(R.id.contacted_badge);
+//		//badge.assignContactFromPhone("630 913 9425", true);
+//		badge.assignContactUri(contact.uri);
+//        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
+		ImageView badge = (ImageView)view.findViewById(R.id.contacted_badge);
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), contact.uri, true);
+        badge.setImageBitmap(BitmapFactory.decodeStream(input));
+		TextView name = (TextView)view.findViewById(R.id.contacted_name);
+		name.setText(contact.name);
         
 		ContactEvent mostrecent = contact.getLatest();
 		
@@ -83,11 +53,11 @@ public class ContactsAdapter implements ListAdapter{
 		
 		
 		if (mostrecent != null) {
-			method.setText(mostrecent.type == TYPE.CALL ? "phone call" : "text message");
+			method.setText(mostrecent.type == TYPE.SMS ? "text message" : "phone call");
 			if(mostrecent.timestamp == Long.MIN_VALUE){
 				contacted.setText("never");
 			}else{
-				contacted.setText(DateUtils.formatDateRange(context, mostrecent.timestamp, System.currentTimeMillis(), DateUtils.LENGTH_SHORT));
+				contacted.setText(formatTimeAgo(System.currentTimeMillis() - mostrecent.timestamp));
 			}
 		} else {
 			method.setText("none");
@@ -97,47 +67,25 @@ public class ContactsAdapter implements ListAdapter{
 		
 		return view;
 	}
-
-	@Override
-	public int getViewTypeCount() {
-		return 1;
-	}
-
-	@Override
-	public boolean hasStableIds() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void registerDataSetObserver(DataSetObserver arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unregisterDataSetObserver(DataSetObserver arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean areAllItemsEnabled() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled(int arg0) {
-		// TODO Auto-generated method stub
-		return true;
-	}
 	
+	
+	private String formatTimeAgo(long span) {
+		Log.d("ContactsAdapter", "Formatting span "+span);
+		if (span < 1000*60) {
+			return "A few seconds ago";
+		} else if (span < 1000*60*60) {
+			return "A few minutes ago";
+		} else if (span < 1000*60*60*24) {
+			return ""+Math.round(((double)span)/(1000*60*60.0))+" hours ago";
+		} else if (span < 1000*60*60*24*30) {
+			return ""+Math.round(((double)span)/(1000*60*60*24.0))+" days ago";
+		}
+		long value = Math.round(((double)span)/(1000*60*60*24*30.0));
+		if (value <= 1)
+			return "about a month ago";
+		else
+			return "about "+value+" months ago";
+
+	}
 
 }

@@ -38,7 +38,20 @@ public class ContactsData {
 	public List<Contact> getFavoriteContacts() {
 		List<Contact> favorites = new ArrayList<Contact>();
 		for (Contact c : contacts) if (c.starred) favorites.add(c);
+		Collections.sort(favorites, new Comparator<Contact>() {
+
+			@Override
+			public int compare(Contact lhs, Contact rhs) {
+				if (lhs.lastcontact < rhs.lastcontact)
+					return -1;
+				else if (lhs.lastcontact > rhs.lastcontact)
+					return 1;
+				else
+					return 0;
+			}
+		});
 		for (Contact favorite : favorites) Log.d("Contact", "Favorite: "+favorite);
+
 		return favorites;
 	}
 	
@@ -75,13 +88,14 @@ public class ContactsData {
 		 * http://www.higherpass.com/Android/Tutorials/Working-With-Android-Contacts/
 		 */
 		ContentResolver cr = context.getContentResolver();
-		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.Contacts.DISPLAY_NAME+" ASC");
+		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts.STARRED+" is 1", null, ContactsContract.Contacts.DISPLAY_NAME+" ASC");
 		if (cur.getCount() > 0) {
 			while (cur.moveToNext()) {
 				Contact contact = new Contact();
 				String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
 				contact.name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 				contact.starred = Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.STARRED))) != 0;
+				contact.uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, id);
 				if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
 					
 					Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,

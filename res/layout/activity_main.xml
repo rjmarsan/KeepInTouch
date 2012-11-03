@@ -1,6 +1,12 @@
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity" />
+    android:background="#110033">
+    <fragment android:name="com.rnm.keepintouch.FavoritesFragment"
+              android:id="@+id/favorites_fragment"
+              android:layout_width="match_parent"
+              android:background="#999911"
+              android:layout_height="match_parent" />
+    
+</LinearLayout>

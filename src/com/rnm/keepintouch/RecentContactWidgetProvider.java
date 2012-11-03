@@ -12,7 +12,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 
 	private static final String TAG = "recendcontactwidgetprovider";
 	
-	String name = "Nelson Osacky";
+	String name = "Nelson What";
 	String phone = "phone";
 	Long time = 22L;
 	
@@ -27,6 +27,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			 
 			 RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
 			          R.layout.widget_layout);
+			 
 			 remoteViews.setTextViewText(R.id.contacted_title, name);
 			 remoteViews.setTextViewText(R.id.contacted_name, name);
 			 remoteViews.setTextViewText(R.id.contacted_time, "" + time);

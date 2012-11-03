@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:background="#199911"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="152dp"
+    android:orientation="horizontal"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="0dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:background="@drawable/tilebackground"
+    android:padding="16dp">
 
     <RelativeLayout 
         android:layout_width="120dp"
@@ -30,22 +40,26 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="120dp"
 	    android:orientation="vertical"
-	    android:paddingLeft="10dp">
+	    android:paddingLeft="16dp">
 	    
         <TextView
             android:id="@+id/contacted_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="last contact:"/>
+            android:textStyle="bold"
+            android:textSize="22dp"
+            android:text="Last Contact:"/>
         <TextView
             android:id="@+id/contacted_method"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="18dp"
             android:text="phone call"/>
         <TextView
             android:id="@+id/contacted_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="18dp"
             android:text="17 days ago"/>
         
         
@@ -53,4 +67,5 @@
     
     
 
+</LinearLayout>
 </LinearLayout>

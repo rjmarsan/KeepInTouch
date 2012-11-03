@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.ContactsContract;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +31,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		if(view == null){
 			LayoutInflater inf = LayoutInflater.from(getContext());
 			
-			view = inf.inflate(R.layout.contact_list_item, null);
+			view = inf.inflate(R.layout.contact_list_item, null, false);
 		}
 		
 		Log.d("ContactsAdapter", "Making badge " + contact.name);
@@ -42,7 +42,11 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 //        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
 		ImageView badge = (ImageView)view.findViewById(R.id.contacted_badge);
         InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), contact.uri, true);
-        badge.setImageBitmap(BitmapFactory.decodeStream(input));
+        Bitmap bitmap = BitmapFactory.decodeStream(input);
+        if (bitmap != null)
+        	badge.setImageBitmap(bitmap);
+        else
+        	badge.setImageResource(R.drawable.ic_contact_picture);
 		TextView name = (TextView)view.findViewById(R.id.contacted_name);
 		name.setText(contact.name);
         
@@ -53,6 +57,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		
 		
 		if (mostrecent != null) {
+			method.setVisibility(View.VISIBLE);
 			method.setText(mostrecent.type == TYPE.SMS ? "text message" : "phone call");
 			if(mostrecent.timestamp == Long.MIN_VALUE){
 				contacted.setText("never");
@@ -60,7 +65,8 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 				contacted.setText(formatTimeAgo(System.currentTimeMillis() - mostrecent.timestamp));
 			}
 		} else {
-			method.setText("none");
+			method.setText("");
+			method.setVisibility(View.GONE);
 			contacted.setText("never");
 		}
 		

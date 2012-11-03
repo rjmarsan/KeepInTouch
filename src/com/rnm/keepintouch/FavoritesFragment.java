@@ -30,7 +30,8 @@ public class FavoritesFragment extends Fragment implements OnItemClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		ListView list = new ListView(getActivity());
-		list.setBackgroundColor(Color.RED);
+		list.setDividerHeight(0);
+		//list.setDivider(getResources().getDrawable(android.R.drawable.menu_frame));
 		contactsAdapter = new ContactsAdapter(getActivity(), R.layout.contact_list_item, ((MainActivity)getActivity()).fav);
 		list.setAdapter(contactsAdapter);
 		list.setOnItemClickListener(this);

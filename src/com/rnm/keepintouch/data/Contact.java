@@ -7,7 +7,7 @@ public class Contact {
 	public String name;
 	public boolean starred;
 	public List<String> phonenumber = new ArrayList<String>();
-	long lastcontact = Long.MAX_VALUE;
+	long lastcontact = Long.MIN_VALUE;
 	public List<ContactEvent> contactEvents = new ArrayList<ContactEvent>();
 	
 	@Override

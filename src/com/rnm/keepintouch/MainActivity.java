@@ -25,7 +25,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         setContentView(R.layout.activity_main);
         
         data = new ContactsData();
-        data.gatherData(this);
+        data.update(this);
+        data.getAlphabeticalContacts();
+        data.getFavoriteContacts();
+        data.getMostRecentContacts();
         
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.

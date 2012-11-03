@@ -2,6 +2,8 @@ package com.rnm.keepintouch.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +31,42 @@ public class ContactsData {
 		Map<String,Contact> map = getNumberMapForContacts(contacts);
 		updateCallLogIntoList(context, map);
 		updateSMSIntoList(context, map);
-		for (Contact contact : contacts) Log.d("Contact", "Contact: "+contact);
 		return contacts;
 	}
+	
+	
+	public List<Contact> getFavoriteContacts() {
+		List<Contact> favorites = new ArrayList<Contact>();
+		for (Contact c : contacts) if (c.starred) favorites.add(c);
+		for (Contact favorite : favorites) Log.d("Contact", "Favorite: "+favorite);
+		return favorites;
+	}
+	
+	public List<Contact> getAlphabeticalContacts() {
+		for (Contact contact : contacts) Log.d("Contact", "Contact: "+contact);
+		return new ArrayList<Contact>(contacts);
+	}
+	public List<Contact> getMostRecentContacts() {
+		ArrayList<Contact> sorted = new ArrayList<Contact>(contacts);
+		Collections.sort(sorted, new Comparator<Contact>() {
+
+			@Override
+			public int compare(Contact lhs, Contact rhs) {
+				if (lhs.lastcontact < rhs.lastcontact)
+					return 1;
+				else if (lhs.lastcontact > rhs.lastcontact)
+					return -1;
+				else
+					return 0;
+			}
+		});
+		for (Contact contact : sorted) Log.d("Contact", "MostRecent: "+contact);
+		return sorted;
+	}
+	
+	
+
+	
 	
 	
 	private List<Contact> getContacts(Context context) {
@@ -46,7 +81,7 @@ public class ContactsData {
 				Contact contact = new Contact();
 				String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
 				contact.name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-				contact.starred = Boolean.parseBoolean(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.STARRED)));
+				contact.starred = Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.STARRED))) != 0;
 				if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
 					
 					Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
@@ -103,7 +138,7 @@ public class ContactsData {
 	               event.callType = type;
 	               
 	               target.contactEvents.add(event);
-	               if (event.timestamp < target.lastcontact) {
+	               if (event.timestamp > target.lastcontact) {
 	            	   target.lastcontact = event.timestamp;
 	               }
                }
@@ -129,7 +164,7 @@ public class ContactsData {
 					event.message = body;
 					
 					target.contactEvents.add(event);
-					if (event.timestamp < target.lastcontact) {
+					if (event.timestamp > target.lastcontact) {
 						target.lastcontact = event.timestamp;
 					}
 				}
@@ -142,6 +177,8 @@ public class ContactsData {
 
 	
 	private String reduceNumber(String number) {
-		return number.replace(" ", "").replace("-", "").replace("(", "").replace(")", "");
+		String s = number.replace(" ", "").replace("-", "").replace("(", "").replace(")", "").replace("+", "");
+		if (s.startsWith("1")) s=s.replaceFirst("1", "");
+		return s;
 	}
 }

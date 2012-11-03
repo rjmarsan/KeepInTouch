@@ -1,11 +1,13 @@
 package com.rnm.keepintouch;
 
+import java.awt.font.TextAttribute;
 import java.io.InputStream;
 import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,9 +22,11 @@ import com.rnm.keepintouch.data.ContactEvent;
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
 public class ContactsAdapter extends ArrayAdapter<Contact> {
+	Typeface thin;
 	
 	public ContactsAdapter(Context context, int textViewResourceId, List<Contact> objects) {
 		super(context, textViewResourceId, objects);
+		thin = Typeface.createFromAsset(context.getAssets(),"Roboto-Light.ttf");
 	}
 
 	@Override
@@ -52,9 +56,16 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
         
 		ContactEvent mostrecent = contact.getLatest();
 		
+		if (position != 0) view.findViewById(R.id.spacertop).setVisibility(View.GONE);
+		else view.findViewById(R.id.spacertop).setVisibility(View.VISIBLE);
+		if (position != getCount()-1) view.findViewById(R.id.spacerbottom).setVisibility(View.GONE);
+		else view.findViewById(R.id.spacerbottom).setVisibility(View.VISIBLE);
+		
 		TextView method = (TextView)view.findViewById(R.id.contacted_method);		
 		TextView contacted = (TextView)view.findViewById(R.id.contacted_time);
 		
+		method.setTypeface(thin);
+		contacted.setTypeface(thin);
 		
 		if (mostrecent != null) {
 			method.setVisibility(View.VISIBLE);
@@ -88,9 +99,9 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		}
 		long value = Math.round(((double)span)/(1000*60*60*24*30.0));
 		if (value <= 1)
-			return "about a month ago";
+			return "a month ago";
 		else
-			return "about "+value+" months ago";
+			return ""+value+" months ago";
 
 	}
 

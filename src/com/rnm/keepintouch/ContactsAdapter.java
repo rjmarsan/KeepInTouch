@@ -71,13 +71,13 @@ public class ContactsAdapter implements ListAdapter{
 		
 		TextView contacted = (TextView)view.findViewById(R.id.contacted);
 		
-		long contactTime = contact.getLatestEventTime();
+		long contactTime = contact.getDayDifference();
 		
-		if(contactTime == -1){
+		
+		if(contactTime == Long.MIN_VALUE){
 			contacted.setText("Never");
 		}else{
-			long time = System.currentTimeMillis() - contact.getLatestEventTime();
-			contacted.setText("Last contacted: " + time/(24*60*60*1000) + "days ago");
+			contacted.setText("Last contacted: " + contactTime + "days ago");
 		}
 		
 		

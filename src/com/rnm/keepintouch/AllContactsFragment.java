@@ -1,6 +1,5 @@
 package com.rnm.keepintouch;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;

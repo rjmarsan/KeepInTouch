@@ -4,6 +4,8 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -31,10 +33,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         setContentView(R.layout.activity_main);
         
         data = new ContactsData();
-        data.update(this);
+        data.update(getApplicationContext());
         alpha = data.getAlphabeticalContacts();
         fav = data.getFavoriteContacts();
         rec = data.getMostRecentContacts();
+        
+        new GetDataTask(getApplicationContext()).execute();
         
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -75,7 +79,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
-
     
 
     @Override
@@ -132,4 +135,39 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         }
     }
 
+    class GetDataTask extends AsyncTask<Void, Void, ContactsData>{
+    	Context context;
+//    	private ProgressDialog dialog;
+    	
+    	public GetDataTask(Context context){
+    		this.context = context;
+    	}
+    	
+    	protected void onPreExecute() {
+//    		dialog = new ProgressDialog(context);
+//            this.dialog.setMessage("Loading contacts data");
+//            this.dialog.show();
+        }
+    	
+		@Override
+		protected ContactsData doInBackground(Void... params) {
+			ContactsData d = new ContactsData();
+			d.update(context);
+			return d;
+		}
+		
+		@Override
+		protected void onPostExecute(ContactsData d){
+			data = d;
+			alpha = data.getAlphabeticalContacts();
+	        fav = data.getFavoriteContacts();
+	        rec = data.getMostRecentContacts();
+//	        if (dialog.isShowing()) {
+//	            dialog.dismiss();
+//	        }
+		}
+		
+		
+    	
+    }
 }

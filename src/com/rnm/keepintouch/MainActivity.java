@@ -1,5 +1,7 @@
 package com.rnm.keepintouch;
 
+import java.util.List;
+
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
+import com.rnm.keepintouch.data.Contact;
 import com.rnm.keepintouch.data.ContactsData;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
@@ -18,6 +21,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     ViewPager mViewPager;
     ContactsData data;
+    List<Contact> alpha;
+    List<Contact> fav;
+    List<Contact> rec;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,9 +32,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         
         data = new ContactsData();
         data.update(this);
-        data.getAlphabeticalContacts();
-        data.getFavoriteContacts();
-        data.getMostRecentContacts();
+        alpha = data.getAlphabeticalContacts();
+        fav = data.getFavoriteContacts();
+        rec = data.getMostRecentContacts();
         
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.

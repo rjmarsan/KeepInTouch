@@ -29,7 +29,6 @@ public class MainActivity extends FragmentActivity {
 //        fav = data.getFavoriteContacts();
 //        rec = data.getMostRecentContacts();
         
-        new GetDataTask(getApplicationContext()).execute();
         main = (FavoritesFragment)getSupportFragmentManager().findFragmentById(R.id.favorites_fragment);
         
         getActionBar().setTitle("Keep In Touch");
@@ -39,6 +38,12 @@ public class MainActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+        new GetDataTask(getApplicationContext()).execute();
     }
     
 

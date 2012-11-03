@@ -1,5 +1,7 @@
 package com.rnm.keepintouch.data;
 
+import android.provider.CallLog;
+
 public class ContactEvent {
 
 	@Override
@@ -16,4 +18,12 @@ public class ContactEvent {
 	public String number;
 	public int callType;
 	public String message;
+	
+	public boolean isOutgoing() {
+		if (type == TYPE.CALL) {
+			return callType == CallLog.Calls.OUTGOING_TYPE;
+		} else {
+			return false;
+		}
+	}
 }

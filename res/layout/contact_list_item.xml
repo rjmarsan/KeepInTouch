@@ -53,26 +53,37 @@
         <TextView
             android:id="@+id/contacted_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:textStyle="normal"
             android:textSize="22dp"
+            android:gravity="center_vertical"
             android:textColor="#222222"
             android:text="Last Contact:"/>
         <TextView
             android:id="@+id/contacted_method"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="26dp"
+            android:gravity="center_vertical"
             android:textSize="18dp"
             android:textColor="#222222"
+            android:singleLine="true"
             android:text="phone call"/>
         <TextView
             android:id="@+id/contacted_time"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="26dp"
+            android:gravity="center_vertical"
             android:textSize="18dp"
             android:textColor="#222222"
+            android:singleLine="true"
             android:text="17 days ago"/>
-        
+        <ImageView 
+            android:id="@+id/contacted_direction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            />
+            
         
     </LinearLayout>
     

@@ -62,6 +62,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		
 		TextView method = (TextView)view.findViewById(R.id.contacted_method);		
 		TextView contacted = (TextView)view.findViewById(R.id.contacted_time);
+		ImageView direction = (ImageView)view.findViewById(R.id.contacted_direction);
 		
 		method.setTypeface(thin);
 		contacted.setTypeface(thin);
@@ -69,12 +70,15 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		if (mostrecent != null) {
 			method.setVisibility(View.VISIBLE);
 			method.setText(mostrecent.type == TYPE.SMS ? "text message" : "phone call");
+			direction.setVisibility(View.VISIBLE);
+			direction.setImageResource(mostrecent.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
 			if(mostrecent.timestamp == Long.MIN_VALUE){
 				contacted.setText("never");
 			}else{
 				contacted.setText(formatTimeAgo(System.currentTimeMillis() - mostrecent.timestamp));
 			}
 		} else {
+			direction.setVisibility(View.GONE);
 			method.setText("");
 			method.setVisibility(View.GONE);
 			contacted.setText("never");

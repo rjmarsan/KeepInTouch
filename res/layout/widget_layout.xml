@@ -20,7 +20,7 @@
 	        android:src="@drawable/ic_contact_picture"/>
     	<TextView
 	        android:id="@+id/contacted_name"
-	        android:text="Nelson Osacky"
+	        android:text="Mom"
 	        android:textSize="12dp"
 	        android:layout_width="match_parent"
 	        android:layout_height="30dp"

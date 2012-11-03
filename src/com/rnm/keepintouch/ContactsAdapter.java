@@ -1,6 +1,5 @@
 package com.rnm.keepintouch;
 
-import java.awt.font.TextAttribute;
 import java.io.InputStream;
 import java.util.List;
 

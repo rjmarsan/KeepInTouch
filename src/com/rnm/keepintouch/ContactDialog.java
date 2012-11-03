@@ -57,5 +57,6 @@ public class ContactDialog extends DialogFragment {
 	private void sms(String phone){
 		Intent sendIntent = new Intent(Intent.ACTION_VIEW);         
 		sendIntent.setData(Uri.parse("sms:" + phone));
+		startActivity(sendIntent);
 	}
 }

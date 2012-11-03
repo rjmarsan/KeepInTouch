@@ -15,7 +15,7 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="In Touch"
-        android:theme="@android:style/Theme.Holo.Light" >
+        android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <receiver
-	       android:name="RecentContactWidgetProvider" >
+	       android:name=".RecentContactWidgetProvider" >
 	       <intent-filter >
 	            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 	       </intent-filter>

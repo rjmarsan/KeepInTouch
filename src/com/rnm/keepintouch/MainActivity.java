@@ -32,6 +32,7 @@ public class MainActivity extends FragmentActivity {
         new GetDataTask(getApplicationContext()).execute();
         main = (FavoritesFragment)getSupportFragmentManager().findFragmentById(R.id.favorites_fragment);
         
+        getActionBar().setTitle("Keep In Touch");
     }
 
     @Override

@@ -89,9 +89,9 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 	private String formatTimeAgo(long span) {
 		Log.d("ContactsAdapter", "Formatting span "+span);
 		if (span < 1000*60) {
-			return "A few seconds ago";
+			return "a few seconds ago";
 		} else if (span < 1000*60*60) {
-			return "A few minutes ago";
+			return "a few minutes ago";
 		} else if (span < 1000*60*60*24) {
 			return ""+Math.round(((double)span)/(1000*60*60.0))+" hours ago";
 		} else if (span < 1000*60*60*24*30) {

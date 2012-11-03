@@ -14,27 +14,12 @@ public class Contact {
 	
 	private static final int MILLIS_IN_DAY = 24*60*60*1000;
 	
-//	public long getLatestEventTime(){
-//		if(contactEvents.size() == 0){
-//			return -1;
-//		}
-//		Collections.sort(contactEvents, new customComparator());
-//		return contactEvents.get(0).timestamp;
-//	}
-	
 	public long getDayDifference(){
 		if(lastcontact == Long.MIN_VALUE){
 			return Long.MIN_VALUE;
 		}
 		long days = (System.currentTimeMillis() - lastcontact)/(MILLIS_IN_DAY);
 		return days;
-	}
-	
-	public class customComparator implements Comparator<ContactEvent>{
-		@Override
-	    public int compare(ContactEvent object1, ContactEvent object2) {
-	        return (int) (object2.timestamp - object1.timestamp);
-	    }
 	}
 	
 	@Override

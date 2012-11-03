@@ -8,9 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.QuickContact;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -52,6 +54,14 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
         	badge.setImageResource(R.drawable.ic_contact_picture);
 		TextView name = (TextView)view.findViewById(R.id.contacted_name);
 		name.setText(contact.name);
+		
+		view.findViewById(R.id.contacted_badge_box).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				QuickContact.showQuickContact(getContext(), v, contact.uri, QuickContact.MODE_LARGE, null);
+			}
+		});
+
         
 		ContactEvent mostrecent = contact.getLatest();
 		

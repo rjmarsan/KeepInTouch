@@ -11,8 +11,8 @@ public class ContactEvent {
 		CALL, SMS
 	}
 	
-	TYPE type;
-	long timestamp;
-	int callType;
-	String message;
+	public TYPE type;
+	public long timestamp;
+	public int callType;
+	public String message;
 }

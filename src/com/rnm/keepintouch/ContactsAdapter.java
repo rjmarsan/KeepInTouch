@@ -4,13 +4,18 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.provider.ContactsContract;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
+import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.rnm.keepintouch.data.Contact;
+import com.rnm.keepintouch.data.ContactEvent;
+import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
 public class ContactsAdapter implements ListAdapter{
 	
@@ -66,18 +71,27 @@ public class ContactsAdapter implements ListAdapter{
 			view = inf.inflate(R.layout.contact_list_item, null);
 		}
 		
-		TextView name = (TextView)view.findViewById(R.id.contact_name);
-		name.setText(contact.name);
 		
-		TextView contacted = (TextView)view.findViewById(R.id.contacted);
+		QuickContactBadge badge = (QuickContactBadge)view.findViewById(R.id.contacted_badge);
+		badge.assignContactFromPhone(contact.phonenumber.get(0), false);
+        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
+        
+		ContactEvent mostrecent = contact.getLatest();
 		
-		long contactTime = contact.getDayDifference();
+		TextView method = (TextView)view.findViewById(R.id.contacted_method);		
+		TextView contacted = (TextView)view.findViewById(R.id.contacted_time);
 		
 		
-		if(contactTime == Long.MIN_VALUE){
-			contacted.setText("Never");
-		}else{
-			contacted.setText("Last contacted: " + contactTime + "days ago");
+		if (mostrecent != null) {
+			method.setText(mostrecent.type == TYPE.CALL ? "phone call" : "text message");
+			if(mostrecent.timestamp == Long.MIN_VALUE){
+				contacted.setText("never");
+			}else{
+				contacted.setText(DateUtils.formatDateRange(context, mostrecent.timestamp, System.currentTimeMillis(), DateUtils.LENGTH_SHORT));
+			}
+		} else {
+			method.setText("none");
+			contacted.setText("never");
 		}
 		
 		

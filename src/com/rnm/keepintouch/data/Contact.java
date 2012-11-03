@@ -22,6 +22,17 @@ public class Contact {
 		return days;
 	}
 	
+	public ContactEvent getLatest() {
+		if (contactEvents.isEmpty()) return null;
+		ContactEvent mostrecent = contactEvents.get(0);
+		for (ContactEvent event : contactEvents) {
+			if (mostrecent.timestamp < event.timestamp) {
+				event = mostrecent;
+			}
+		}
+		return mostrecent;
+	}
+	
 	@Override
 	public String toString() {
 		return "Contact [name=" + name + ", starred=" + starred

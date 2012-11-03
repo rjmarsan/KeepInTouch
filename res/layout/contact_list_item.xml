@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/contact_name"
+    <QuickContactBadge
+        android:id="@+id/contacted_badge"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:text="Name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/contacted"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:text="Contacted"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    android:paddingLeft="10dp">
+	    
+        <TextView
+            android:id="@+id/contacted_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="last contact:"/>
+        <TextView
+            android:id="@+id/contacted_method"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="phone call"/>
+        <TextView
+            android:id="@+id/contacted_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="17 days ago"/>
+        
+        
+    </LinearLayout>
+    
+    
 
-</RelativeLayout>
+</LinearLayout>

@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -72,6 +72,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+        actionBar.selectTab(actionBar.getTabAt(0));
     }
 
     @Override
@@ -110,9 +111,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 			switch (i) {
 			case 0:
-				return new AllContactsFragment();
-			case 1:
 				return new FavoritesFragment();
+			case 1:
+				return new AllContactsFragment();
 			case 2:
 				return new RecentFragment();
 			}
@@ -121,7 +122,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         @Override
         public int getCount() {
-            return 3;
+            return 1;
         }
 
         @Override

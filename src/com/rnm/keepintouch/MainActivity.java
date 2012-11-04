@@ -64,9 +64,9 @@ public class MainActivity extends FragmentActivity {
     	
 		@Override
 		protected ContactsData doInBackground(Void... params) {
-			ContactsData d = new ContactsData();
-			d.update(context);
-			return d;
+			if (data == null) data = new ContactsData();
+			data.update(context);
+			return data;
 		}
 		
 		@Override

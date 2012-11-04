@@ -1,7 +1,6 @@
 package com.rnm.keepintouch.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,22 +23,33 @@ public class ContactsData {
 	List<Contact> contacts;
 	
 	public void update(Context context) {
-		this.contacts = gatherData(context);
+		Log.d("Contacts", "************************************ Starting run...");
+		long start = System.currentTimeMillis();
+		this.contacts = gatherData(context, contacts);
+		Log.d("Contacts", "************************************ Finishing contacts. elapsed time: "+(System.currentTimeMillis()-start));
 	}
 	
-	public List<Contact> gatherData(Context context) {
-		List<Contact> contacts = getContacts(context);
+	public List<Contact> gatherData(Context context, List<Contact> contacts) {
+		  long start = System.currentTimeMillis();
+		if (contacts == null) contacts = getContacts(context);
+		  Log.d("Contacts", "********* contactsmap1.elapsed time: "+(System.currentTimeMillis()-start));
+		  start = System.currentTimeMillis();
 		Map<String,List<Contact>> map = getNumberMapForContacts(contacts);
+		  Log.d("Contacts", "********* contactsmap. elapsed time: "+(System.currentTimeMillis()-start));
+		  start = System.currentTimeMillis();
 		updateCallLogIntoList(context, map);
+		  Log.d("Contacts", "********* calllog.     elapsed time: "+(System.currentTimeMillis()-start));
+		  start = System.currentTimeMillis();
 		updateSMSIntoList(context, map);
+		  Log.d("Contacts", "********* smslist.     elapsed time: "+(System.currentTimeMillis()-start));
 		return contacts;
 	}
 	
 	
 	public List<Contact> getFavoriteContacts() {
-		List<Contact> favorites = new ArrayList<Contact>();
-		for (Contact c : contacts) if (c.starred) favorites.add(c);
-		Collections.sort(favorites, new Comparator<Contact>() {
+//		List<Contact> favorites = new ArrayList<Contact>();
+//		for (Contact c : contacts) if (c.starred) favorites.add(c);
+		Collections.sort(contacts, new Comparator<Contact>() {
 
 			@Override
 			public int compare(Contact lhs, Contact rhs) {
@@ -51,9 +61,9 @@ public class ContactsData {
 					return 0;
 			}
 		});
-		for (Contact favorite : favorites) Log.d("Contact", "Favorite: "+favorite);
+//		for (Contact favorite : favorites) Log.d("Contact", "Favorite: "+favorite);
 
-		return favorites;
+		return contacts;
 	}
 	
 	public List<Contact> getAlphabeticalContacts() {
@@ -74,7 +84,7 @@ public class ContactsData {
 					return 0;
 			}
 		});
-		for (Contact contact : sorted) Log.d("Contact", "MostRecent: "+contact);
+//		for (Contact contact : sorted) Log.d("Contact", "MostRecent: "+contact);
 		return sorted;
 	}
 	
@@ -89,7 +99,12 @@ public class ContactsData {
 		 * http://www.higherpass.com/Android/Tutorials/Working-With-Android-Contacts/
 		 */
 		ContentResolver cr = context.getContentResolver();
-		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts.STARRED+" is 1", null, ContactsContract.Contacts.DISPLAY_NAME+" ASC");
+		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, 
+				new String[] {ContactsContract.Contacts._ID,
+				              ContactsContract.Contacts.DISPLAY_NAME, 
+				              ContactsContract.Contacts.STARRED,
+				              ContactsContract.Contacts.HAS_PHONE_NUMBER}, 
+				ContactsContract.Contacts.STARRED+" is 1", null, null);
 		if (cur.getCount() > 0) {
 			while (cur.moveToNext()) {
 				Contact contact = new Contact();
@@ -152,10 +167,11 @@ public class ContactsData {
 		 * http://malsandroid.blogspot.com/2010/06/accessing-call-logs.html
 		 */
 		Uri allCalls = Uri.parse("content://call_log/calls");
-        Cursor c = context.getContentResolver().query(allCalls, null, null, null, null);
-        if (c.moveToFirst())
-        {
-           do{
+        Cursor c = context.getContentResolver().query(allCalls, 
+        		new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION},
+        		null, null, null);
+        if (c.moveToFirst()) {
+           do {
                String num = c.getString(c.getColumnIndex(CallLog.Calls.NUMBER));
                
                if (contacts.containsKey(reduceNumber(num))) {
@@ -188,26 +204,26 @@ public class ContactsData {
 	
 	private void updateSMSIntoList(Context context, Map<String, List<Contact>> contacts) {
 		Uri uri = Uri.parse("content://sms");
-		Cursor c = context.getContentResolver().query(uri, null, null, null,null);
+		Cursor c = context.getContentResolver().query(uri, new String[] {"date", "type", "address"}, null, null, null);
 
 		if (c.moveToFirst()) {
 			for (int i = 0; i < c.getCount(); i++) {
-				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
-				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
+//				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
+//				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
 				
-				String body = c.getString(c.getColumnIndexOrThrow("body")).toString();
+				//String body = c.getString(c.getColumnIndexOrThrow("body")).toString();
 				long timestamp = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
 				int type = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("type")).toString());
 				String number = c.getString(c.getColumnIndexOrThrow("address")).toString();
 				if (contacts.containsKey(reduceNumber(number))) {
 					Contact target = getContactFromList(contacts.get(reduceNumber(number)), number, context);
-					Log.d("Contacts", "looked for : "+reduceNumber(number)+ " and found "+target+" for "+number);
+//					Log.d("Contacts", "looked for : "+reduceNumber(number)+ " and found "+target+" for "+number);
 	            	if (target != null) {
 		            	
 						ContactEvent event = new ContactEvent();
 						event.type = TYPE.SMS;
 						event.timestamp = timestamp;
-						event.message = body;
+						//event.message = body;
 						event.number = number;
 						event.callType = type;
 						

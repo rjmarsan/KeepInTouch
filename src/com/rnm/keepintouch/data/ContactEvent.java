@@ -20,10 +20,6 @@ public class ContactEvent {
 	public String message;
 	
 	public boolean isOutgoing() {
-		if (type == TYPE.CALL) {
-			return callType == CallLog.Calls.OUTGOING_TYPE;
-		} else {
-			return false;
-		}
+		return callType == CallLog.Calls.OUTGOING_TYPE;
 	}
 }

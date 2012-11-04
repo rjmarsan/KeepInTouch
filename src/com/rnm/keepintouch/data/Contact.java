@@ -8,6 +8,7 @@ import android.net.Uri;
 public class Contact {
 	public String name;
 	public boolean starred;
+	public String matchNumber;
 	public List<String> phonenumber = new ArrayList<String>();
 	long lastcontact = Long.MIN_VALUE;
 	public List<ContactEvent> contactEvents = new ArrayList<ContactEvent>();

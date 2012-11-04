@@ -40,7 +40,11 @@ public class ContactsData {
 		updateCallLogIntoList(context, map);
 		  Log.d("Contacts", "********* calllog.     elapsed time: "+(System.currentTimeMillis()-start));
 		  start = System.currentTimeMillis();
-		updateSMSIntoList(context, map);
+		try {
+			updateSMSIntoList(context, map);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		  Log.d("Contacts", "********* smslist.     elapsed time: "+(System.currentTimeMillis()-start));
 		return contacts;
 	}

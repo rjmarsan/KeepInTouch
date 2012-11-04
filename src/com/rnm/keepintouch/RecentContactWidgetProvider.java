@@ -19,9 +19,8 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds){
-		 final int N = appWidgetIds.length;
 		 
-		 Log.i(TAG, "on update widget: " + N);
+		 Log.i(TAG, "on update widget: " + appWidgetIds.length);
 		 for (int widgetId : appWidgetIds) {
 			 Log.i(TAG, "looping through widgets");
 			 

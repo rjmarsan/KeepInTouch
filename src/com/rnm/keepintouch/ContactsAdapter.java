@@ -1,7 +1,10 @@
 package com.rnm.keepintouch;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
+
+import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,10 +27,12 @@ import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
 public class ContactsAdapter extends ArrayAdapter<Contact> {
 	Typeface thin;
+	PrettyTime p = new PrettyTime();
 	
 	public ContactsAdapter(Context context, int textViewResourceId, List<Contact> objects) {
 		super(context, textViewResourceId, objects);
 		thin = Typeface.createFromAsset(context.getAssets(),"Roboto-Light.ttf");
+		p.setLocale(context.getResources().getConfiguration().locale);
 	}
 
 	@Override
@@ -85,7 +90,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			if(mostrecent.timestamp == Long.MIN_VALUE){
 				contacted.setText("never");
 			}else{
-				contacted.setText(formatTimeAgo(System.currentTimeMillis() - mostrecent.timestamp));
+				contacted.setText(formatTimeAgo(mostrecent.timestamp));
 			}
 		} else {
 			direction.setVisibility(View.GONE);
@@ -99,24 +104,25 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 	}
 	
 	
-	private String formatTimeAgo(long span) {
-		Log.d("ContactsAdapter", "Formatting span "+span);
-		if (span < 1000*60) {
-			return "a few seconds ago";
-		} else if (span < 1000*60*5) {
-			return "a few minutes ago";
-		} else if (span < 1000*60*60) {
-			return ""+Math.round(((double)span)/(1000*60.0))+" minutes ago";
-		} else if (span < 1000*60*60*24) {
-			return ""+Math.round(((double)span)/(1000*60*60.0))+" hours ago";
-		} else if (span < 1000*60*60*24*30) {
-			return ""+Math.round(((double)span)/(1000*60*60*24.0))+" days ago";
-		}
-		long value = Math.round(((double)span)/(1000*60*60*24*30.0));
-		if (value <= 1)
-			return "a month ago";
-		else
-			return ""+value+" months ago";
+	private String formatTimeAgo(long ago) {
+		Log.d("ContactsAdapter", "Formatting span "+ago);
+		return p.format(new Date(ago));
+//		if (span < 1000*60) {
+//			return "a few seconds ago";
+//		} else if (span < 1000*60*5) {
+//			return "a few minutes ago";
+//		} else if (span < 1000*60*60) {
+//			return ""+Math.round(((double)span)/(1000*60.0))+" minutes ago";
+//		} else if (span < 1000*60*60*24) {
+//			return ""+Math.round(((double)span)/(1000*60*60.0))+" hours ago";
+//		} else if (span < 1000*60*60*24*30) {
+//			return ""+Math.round(((double)span)/(1000*60*60*24.0))+" days ago";
+//		}
+//		long value = Math.round(((double)span)/(1000*60*60*24*30.0));
+//		if (value <= 1)
+//			return "a month ago";
+//		else
+//			return ""+value+" months ago";
 
 	}
 

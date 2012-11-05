@@ -5,7 +5,6 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +12,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.rnm.keepintouch.data.Contact;
 import com.rnm.keepintouch.data.ContactEvent;
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
-public class FavoritesFragment extends Fragment implements OnItemClickListener {
+public class FavoritesFragment extends SherlockFragment implements OnItemClickListener {
 	
 	ContactsAdapter contactsAdapter;
 	List<Contact> contactlist;

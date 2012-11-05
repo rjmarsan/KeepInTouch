@@ -5,13 +5,13 @@ import java.util.List;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.view.Menu;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
 import com.rnm.keepintouch.data.Contact;
 import com.rnm.keepintouch.data.ContactsData;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends SherlockFragmentActivity {
 
     ContactsData data;
     List<Contact> fav = new ArrayList<Contact>();
@@ -24,12 +24,12 @@ public class MainActivity extends FragmentActivity {
         
         main = (FavoritesFragment)getSupportFragmentManager().findFragmentById(R.id.favorites_fragment);
         
-        getActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
+        getSupportMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
     

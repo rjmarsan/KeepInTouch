@@ -157,8 +157,9 @@ public class ContactsData {
 		Log.d("Contact", "Looking up :"+contact.name+ " with number: "+number);
 		
 		Cursor c = context.getContentResolver().query(allCalls, 
-        		/*new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION, "normalized_number"}*/null,
-        		"normalized_number = ?", new String[] {number}, null);
+        		new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION, "normalized_number"}/*null*/,
+        		null, null, null);
+        		/*"normalized_number = ?", new String[] {number}, null);*/
         if (c.moveToFirst()) {
            do {
 //				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));

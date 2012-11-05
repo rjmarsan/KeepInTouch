@@ -1,11 +1,10 @@
 package com.rnm.keepintouch.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -13,7 +12,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberUtils;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
@@ -34,19 +34,21 @@ public class ContactsData {
 		if (contacts == null) contacts = getContacts(context);
 		  Log.d("Contacts", "********* contactsmap1.elapsed time: "+(System.currentTimeMillis()-start));
 		  start = System.currentTimeMillis();
-		Map<String,List<Contact>> map = getNumberMapForContacts(contacts);
-		  Log.d("Contacts", "********* contactsmap. elapsed time: "+(System.currentTimeMillis()-start));
-		  start = System.currentTimeMillis();
-		updateCallLogIntoList(context, map);
+		updateCallLogIntoList(context, contacts);
 		  Log.d("Contacts", "********* calllog.     elapsed time: "+(System.currentTimeMillis()-start));
 		  start = System.currentTimeMillis();
-		try {
-			updateSMSIntoList(context, map);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+			updateSMSIntoList(context, contacts);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		  Log.d("Contacts", "********* smslist.     elapsed time: "+(System.currentTimeMillis()-start));
 		return contacts;
+	}
+	
+	public void updateContact(Context context, Contact contact) {
+		updateCallLogForContact(context, contact);
+		updateSMSForContact(context, contact);
 	}
 	
 	
@@ -70,31 +72,6 @@ public class ContactsData {
 		return contacts;
 	}
 	
-	public List<Contact> getAlphabeticalContacts() {
-		for (Contact contact : contacts) Log.d("Contact", "Contact: "+contact);
-		return new ArrayList<Contact>(contacts);
-	}
-	public List<Contact> getMostRecentContacts() {
-		ArrayList<Contact> sorted = new ArrayList<Contact>(contacts);
-		Collections.sort(sorted, new Comparator<Contact>() {
-
-			@Override
-			public int compare(Contact lhs, Contact rhs) {
-				if (lhs.lastcontact < rhs.lastcontact)
-					return 1;
-				else if (lhs.lastcontact > rhs.lastcontact)
-					return -1;
-				else
-					return 0;
-			}
-		});
-//		for (Contact contact : sorted) Log.d("Contact", "MostRecent: "+contact);
-		return sorted;
-	}
-	
-	
-
-	
 	
 	
 	private List<Contact> getContacts(Context context) {
@@ -108,28 +85,48 @@ public class ContactsData {
 				              ContactsContract.Contacts.DISPLAY_NAME, 
 				              ContactsContract.Contacts.STARRED,
 				              ContactsContract.Contacts.HAS_PHONE_NUMBER}, 
-				ContactsContract.Contacts.STARRED+" is 1", null, null);
+				ContactsContract.Contacts.STARRED+" = ?", new String[] {"1"}, null);
 		if (cur.getCount() > 0) {
 			while (cur.moveToNext()) {
 				Contact contact = new Contact();
-				String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+				contact.id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
 				contact.name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 				contact.starred = Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.STARRED))) != 0;
-				contact.uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, id);
+				contact.uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, contact.id);
 				if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
 					
-					Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
-									ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[] { id }, null);
-
+					/** Query the secondary database to get the actual phone number **/
+					Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
+							new String[] {Phone.NUMBER, Phone.NORMALIZED_NUMBER},
+							ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", 
+							new String[] { contact.id }, null);
 					while (pCur.moveToNext()) {
 						String number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+						String normnumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
 						if (number != null) {
 							contact.phonenumber.add(number);
+							contact.normphonenumber.add(normnumber);
 						}
 					}
 					pCur.close();	
 					
+					/** Query the raw database to get the other IDs this contact goes by **/
+					 pCur = cr.query(RawContacts.CONTENT_URI,
+					          new String[]{RawContacts._ID},
+					          RawContacts.CONTACT_ID + "=?",
+					          new String[]{String.valueOf(contact.id)}, null);
+					while (pCur.moveToNext()) {
+						String id = pCur.getString(pCur.getColumnIndex(RawContacts._ID));
+						if (id != null) {
+							contact.rawids.add(id);
+						}
+					}
+					pCur.close();	
+
+
+					
 					contacts.add(contact); //only add if we have a phone number
+					Log.d("Contact", contact.toString());
 				}
 			}
 		}
@@ -138,104 +135,92 @@ public class ContactsData {
 	}
 	
 	
-	private HashMap<String,List<Contact>> getNumberMapForContacts(List<Contact> contacts) {
-		HashMap<String,List<Contact>> map = new HashMap<String,List<Contact>>();
-		for (Contact contact : contacts) {
-			for (String number : contact.phonenumber) {
-				addToList(map, reduceNumber(number), contact);
-			}
-		}
-		return map;
+	
+	private void updateCallLogIntoList(Context context, List<Contact> contacts) {
+		for (Contact contact : contacts) 
+			updateCallLogForContact(context, contact);
 	}
-	
-	private void addToList(HashMap<String,List<Contact>> map, String entry, Contact contact) {
-		if (map.containsKey(entry) == false) {
-			map.put(entry, new ArrayList<Contact>());
-		} 
-		map.get(entry).add(contact);
+	private void updateCallLogForContact(Context context, Contact contact) {
+		for (String number : contact.normphonenumber)
+			updateCallLogForContact(context, contact, number);
 	}
-	
-	private Contact getContactFromList(List<Contact> contacts, String number, Context context) {
-		for (Contact c : contacts) {
-			for (String testnum : c.phonenumber) {
-				if (compareNumber(number, testnum, context))
-					return c;
-			}
-		}
-		return null;
-	}
-	
-	
-	private void updateCallLogIntoList(Context context, Map<String,List<Contact>> contacts) {
+	private void updateCallLogForContact(Context context, Contact contact, String number) {
 		/**
 		 * http://malsandroid.blogspot.com/2010/06/accessing-call-logs.html
 		 */
 		Uri allCalls = Uri.parse("content://call_log/calls");
-        Cursor c = context.getContentResolver().query(allCalls, 
-        		new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION},
-        		null, null, null);
+
+		
+		Log.d("Contact", "Looking up :"+contact.name+ " with number: "+number);
+		
+		Cursor c = context.getContentResolver().query(allCalls, 
+        		/*new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION, "normalized_number"}*/null,
+        		"normalized_number = ?", new String[] {number}, null);
         if (c.moveToFirst()) {
            do {
+//				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
+//				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
+//				Log.d("Contacts", "     "+CallLog.Calls._ID+": "+c.getString(c.getColumnIndex(CallLog.Calls._ID)));
+				
                String num = c.getString(c.getColumnIndex(CallLog.Calls.NUMBER));
-               
-               if (contacts.containsKey(reduceNumber(num))) {
-            	   Contact target = getContactFromList(contacts.get(reduceNumber(num)), num, context);
-            	   if (target == null) continue;
+               long timestamp  = Long.parseLong(c.getString(c.getColumnIndex(CallLog.Calls.DATE)));
+               int type = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.TYPE)));
+               int duration = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.DURATION)));
 
-	               long timestamp  = Long.parseLong(c.getString(c.getColumnIndex(CallLog.Calls.DATE)));
-	               int type = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.TYPE)));
-	               int duration = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.DURATION)));
-
-	               final int CALL_DURATION_THRESH = 1;
-	               //Only log a call if it's not a missed call, and it's a certain duration.
-	               if (duration >= CALL_DURATION_THRESH && type != CallLog.Calls.MISSED_TYPE) {
-		               
-		               ContactEvent event = new ContactEvent();
-		               event.type = TYPE.CALL;
-		               event.timestamp = timestamp;
-		               event.callType = type;
-		               event.number = num;
-		               
-		               target.contactEvents.add(event);
-		               if (event.timestamp > target.lastcontact) {
-		            	   target.lastcontact = event.timestamp;
-		               }
+               final int CALL_DURATION_THRESH = 1;
+               //Only log a call if it's not a missed call, and it's a certain duration.
+               if (duration >= CALL_DURATION_THRESH && type != CallLog.Calls.MISSED_TYPE) {
+	               
+	               ContactEvent event = new ContactEvent();
+	               event.type = TYPE.CALL;
+	               event.timestamp = timestamp;
+	               event.callType = type;
+	               event.number = num;
+	               
+	               contact.contactEvents.add(event);
+	               if (event.timestamp > contact.lastcontact) {
+	            	   contact.lastcontact = event.timestamp;
 	               }
                }
            } while (c.moveToNext());
         }	
 	}
 	
-	private void updateSMSIntoList(Context context, Map<String, List<Contact>> contacts) {
+	private void updateSMSIntoList(Context context, List<Contact> contacts) {
+		for (Contact contact: contacts)
+				updateSMSForContact(context, contact);
+	}
+	private void updateSMSForContact(Context context, Contact contact) {
+		for (String rawid : contact.rawids) 	
+			updateSMSForContact(context, contact, rawid);
+	}
+	private void updateSMSForContact(Context context, Contact contact, String rawid) {
 		Uri uri = Uri.parse("content://sms");
-		Cursor c = context.getContentResolver().query(uri, new String[] {"date", "type", "address"}, null, null, null);
+		Log.d("Contact", "SMSLooking up :"+contact.name+ " with number: ["+rawid+"]");
+		Cursor c = context.getContentResolver().query(uri, new String[] {"MAX(date) as date", "type", "address", "person"}, "person = ?", new String[] {rawid}, null);
+		//Cursor c = context.getContentResolver().query(uri, null, null, null, null);
 
 		if (c.moveToFirst()) {
 			for (int i = 0; i < c.getCount(); i++) {
 //				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
 //				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
 				
-				//String body = c.getString(c.getColumnIndexOrThrow("body")).toString();
-				long timestamp = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
-				int type = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("type")).toString());
-				String number = c.getString(c.getColumnIndexOrThrow("address")).toString();
-				if (contacts.containsKey(reduceNumber(number))) {
-					Contact target = getContactFromList(contacts.get(reduceNumber(number)), number, context);
-//					Log.d("Contacts", "looked for : "+reduceNumber(number)+ " and found "+target+" for "+number);
-	            	if (target != null) {
-		            	
-						ContactEvent event = new ContactEvent();
-						event.type = TYPE.SMS;
-						event.timestamp = timestamp;
-						//event.message = body;
-						event.number = number;
-						event.callType = type;
-						
-						target.contactEvents.add(event);
-						if (event.timestamp > target.lastcontact) {
-							target.lastcontact = event.timestamp;
-						}
-	            	}
+				if (c.getString(c.getColumnIndexOrThrow("date")) != null) {
+					//String body = c.getString(c.getColumnIndexOrThrow("body")).toString();
+					long timestamp = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
+					int type = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("type")).toString());
+					String number = c.getString(c.getColumnIndexOrThrow("address")).toString();
+					ContactEvent event = new ContactEvent();
+					event.type = TYPE.SMS;
+					event.timestamp = timestamp;
+					//event.message = body;
+					event.number = number;
+					event.callType = type;
+					
+					contact.contactEvents.add(event);
+					if (event.timestamp > contact.lastcontact) {
+						contact.lastcontact = event.timestamp;
+					}
 				}
 				c.moveToNext();
 
@@ -244,16 +229,4 @@ public class ContactsData {
 		c.close();
 	}
 
-	
-	private String reduceNumber(String number) {
-		number = PhoneNumberUtils.formatNumber(number);
-		String s = number.replaceAll("[^0-9]", "");
-		if (s.length() > 5)
-			return s.substring(s.length()-4);
-		else
-			return s;
-	}
-	private boolean compareNumber(String number1, String number2, Context context) {
-		return PhoneNumberUtils.compare(context, number1, number2);
-	}
 }

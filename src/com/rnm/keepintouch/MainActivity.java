@@ -23,15 +23,9 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-//        data = new ContactsData();
-//        data.update(getApplicationContext());
-//        alpha = data.getAlphabeticalContacts();
-//        fav = data.getFavoriteContacts();
-//        rec = data.getMostRecentContacts();
-        
         main = (FavoritesFragment)getSupportFragmentManager().findFragmentById(R.id.favorites_fragment);
         
-        //getActionBar().setDisplayShowTitleEnabled(false);
+        getActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override

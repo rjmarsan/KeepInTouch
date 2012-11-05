@@ -1,6 +1,9 @@
 package com.rnm.keepintouch;
 
+import java.io.InputStream;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.ocpsoft.pretty.time.PrettyTime;
 
@@ -11,12 +14,18 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.rnm.keepintouch.data.Contact;
 import com.rnm.keepintouch.data.ContactEvent;
+import com.rnm.keepintouch.data.ContactEvent.TYPE;
 import com.rnm.keepintouch.data.ContactPersist;
 import com.rnm.keepintouch.data.ContactsData;
 
@@ -26,6 +35,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	private static final String TAG = "recendcontactwidgetprovider";
 	
 	public final static String UPDATE_CUSTOM = "com.rnm.keepintouch.UPDATE_CUSTOM";
+	public final static String ACTION_CLICKED = "com.rnm.keepintouch.ACTION_CLICKED";
 	
 	
 	public static void scheduleUpdate(Context pContext) {
@@ -36,7 +46,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	    intent.setClass(pContext, RecentContactWidgetProvider.class);
 	    PendingIntent pi = PendingIntent.getBroadcast(pContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-	    am.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 5000, pi);
+	    am.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000*60*30, pi);
 	}
 	
 	
@@ -66,18 +76,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			 
 			 
 			 RemoteViews remoteViews = setupRemoteViews(context, contact);
-			// Register an onClickListener
-//		      Intent intent = new Intent(context, RecentContactWidgetProvider.class);
-//
-//		      intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//		      intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-//
-//		      PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-//		          0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//		      remoteViews.setOnClickPendingIntent(R.id.contacted_name	, pendingIntent);
-		      
-		      
-		      ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
+			 //ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
 		      
 		      return remoteViews;
 		 }
@@ -87,19 +86,44 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	
 	
 	public static RemoteViews setupRemoteViews(Context context, Contact contact) {
-		 ContactEvent latest = contact.getLatest();
-		 RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-		          R.layout.widget_layout);
-		 
-		 remoteViews.setTextViewText(R.id.contacted_title, contact.name);
-		 remoteViews.setTextViewText(R.id.contacted_name, contact.name);
+		ContactEvent latest = contact.getLatest();
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+				R.layout.widget_layout);
+
+		remoteViews.setTextViewText(R.id.contacted_name, contact.name);
+		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),Uri.parse(contact.uri), true);
+		Bitmap bitmap = BitmapFactory.decodeStream(input);
+		if (bitmap != null)
+			remoteViews.setImageViewBitmap(R.id.contacted_badge, bitmap);
+		else
+			remoteViews.setImageViewResource(R.id.contacted_badge, R.drawable.ic_contact_picture);		 
 		 if (latest != null) {
 			 PrettyTime p = new PrettyTime();
+			 remoteViews.setTextViewText(R.id.contacted_method, latest.type == TYPE.SMS ? "text message" : "phone call");
 			 remoteViews.setTextViewText(R.id.contacted_time, "" + p.format(new Date(latest.timestamp)));
+			 remoteViews.setImageViewResource(R.id.contacted_direction, latest.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
 		 } else {
 			 remoteViews.setTextViewText(R.id.contacted_time, "never" );
+			 remoteViews.setViewVisibility(R.id.contacted_method, View.GONE);
 		 }
-		 return remoteViews;
+
+		 /** setup the main box **/
+		Intent i;
+		String number = (latest != null) ? latest.number : contact.phonenumber.get(0);
+		Log.d(TAG, "Latest : "+latest);
+		if (latest == null || latest.type == TYPE.SMS) {
+			i = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + number));
+		} else {
+			i = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number));
+		}
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, PendingIntent.FLAG_ONE_SHOT, i, 0);
+		remoteViews.setOnClickPendingIntent(R.id.contacted_mainbox,pendingIntent);
+		
+		/** Setup the icon box **/
+		PendingIntent appIntent = PendingIntent.getActivity(context, PendingIntent.FLAG_ONE_SHOT, new Intent(context, MainActivity.class), 0);
+		remoteViews.setOnClickPendingIntent(R.id.contacted_badge_box, appIntent);
+
+		return remoteViews;
 	}
 	
 	@Override
@@ -115,8 +139,10 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 				RemoteViews views = updateId(context, widgetId);
 				if (views != null)
 					manager.updateAppWidget(widgetId, views);
-
 			}
+			Set<String> ok = new HashSet<String>();
+			for (int i : ids) ok.add(i+"");
+			ContactPersist.clearAll(context, ok);
 			scheduleUpdate(context);
 		}
 	}

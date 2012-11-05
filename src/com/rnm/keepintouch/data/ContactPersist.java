@@ -1,5 +1,7 @@
 package com.rnm.keepintouch.data;
 
+import java.util.Set;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -20,5 +22,16 @@ public class ContactPersist {
 			return Contact.fromjson(prefs.getString(key, ""));
 		} 
 		return null;
+	}
+	
+	public static void clearAll(Context context, Set<String> ok) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS_KEY, 0);
+		Editor edit = prefs.edit();
+		for (String key : prefs.getAll().keySet()) {
+			if (ok.contains(key) == false) {
+				edit.remove(key);
+			}
+		}
+		edit.apply();
 	}
 }

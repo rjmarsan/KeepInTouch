@@ -56,8 +56,8 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
         Bitmap bitmap = BitmapFactory.decodeStream(input);
         if (bitmap != null)
         	badge.setImageBitmap(bitmap);
-        else
-        	badge.setImageResource(R.drawable.ic_contact_picture);
+//        else
+//        	badge.setImageResource(R.drawable.ic_contact_picture);
 		TextView name = (TextView)view.findViewById(R.id.contacted_name);
 		name.setText(contact.name);
 		

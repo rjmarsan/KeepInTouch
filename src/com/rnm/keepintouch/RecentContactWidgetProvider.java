@@ -30,7 +30,6 @@ import com.rnm.keepintouch.data.ContactPersist;
 import com.rnm.keepintouch.data.ContactsData;
 
 public class RecentContactWidgetProvider extends AppWidgetProvider {
-//	private static final String ACTION_CLICK = "ACTION_CLICK";
 
 	private static final String TAG = "recendcontactwidgetprovider";
 	

@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.google.gson.GsonBuilder;
 
-import android.net.Uri;
-
 public class Contact {
 	public String name;
 	public boolean starred;

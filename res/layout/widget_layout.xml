@@ -14,7 +14,8 @@
 	    <ImageView
 	        android:id="@+id/contacted_badge"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"/>
+	        android:layout_height="match_parent"
+	        android:src="@drawable/ic_contact_picture"/>
     	<TextView
 	        android:id="@+id/contacted_name"
 	        android:layout_width="match_parent"

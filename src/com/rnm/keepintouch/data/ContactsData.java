@@ -47,8 +47,11 @@ public class ContactsData {
 	}
 	
 	public void updateContact(Context context, Contact contact) {
+		Log.d("Contacts", "************************************ Starting run...");
+		long start = System.currentTimeMillis();
 		updateCallLogForContact(context, contact);
 		updateSMSForContact(context, contact);
+		Log.d("Contacts", "************************************ Finishing contacts. elapsed time: "+(System.currentTimeMillis()-start));
 	}
 	
 	
@@ -92,7 +95,7 @@ public class ContactsData {
 				contact.id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
 				contact.name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 				contact.starred = Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.STARRED))) != 0;
-				contact.uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, contact.id);
+				contact.uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, contact.id).toString();
 				if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
 					
 					/** Query the secondary database to get the actual phone number **/

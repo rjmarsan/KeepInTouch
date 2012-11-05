@@ -3,10 +3,10 @@ package com.rnm.keepintouch;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 
 import com.rnm.keepintouch.data.Contact;
@@ -31,7 +31,7 @@ public class MainActivity extends FragmentActivity {
         
         main = (FavoritesFragment)getSupportFragmentManager().findFragmentById(R.id.favorites_fragment);
         
-        getActionBar().setDisplayShowTitleEnabled(false);
+        //getActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
@@ -43,29 +43,16 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onResume() {
     	super.onResume();
-        new GetDataTask(getApplicationContext()).execute();
+        new GetDataTask().execute();
     }
     
 
 
-    class GetDataTask extends AsyncTask<Void, Void, ContactsData>{
-    	Context context;
-//    	private ProgressDialog dialog;
-    	
-    	public GetDataTask(Context context){
-    		this.context = context;
-    	}
-    	
-    	protected void onPreExecute() {
-//    		dialog = new ProgressDialog(context);
-//            this.dialog.setMessage("Loading contacts data");
-//            this.dialog.show();
-        }
-    	
+    public class GetDataTask extends AsyncTask<Void, Void, ContactsData>{
 		@Override
 		protected ContactsData doInBackground(Void... params) {
 			if (data == null) data = new ContactsData();
-			data.update(context);
+			data.update(MainActivity.this);
 			return data;
 		}
 		
@@ -73,13 +60,12 @@ public class MainActivity extends FragmentActivity {
 		protected void onPostExecute(ContactsData d){
 			data = d;
 	        fav = data.getFavoriteContacts();
+//			String json = fav.get(fav.size()-1).jsonize();
+//			Log.d("JSONTEST", "To JSON: "+json);
+//			Contact backagain = Contact.fromjson(json);
+//			Log.d("JSONTEST", "Back again: "+backagain);
 	        main.refresh(fav);
-//	        if (dialog.isShowing()) {
-//	            dialog.dismiss();
-//	        }
 		}
-		
-		
-    	
     }
+    
 }

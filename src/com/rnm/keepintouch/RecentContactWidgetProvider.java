@@ -1,36 +1,71 @@
 package com.rnm.keepintouch;
 
+import java.util.Date;
+
+import org.ocpsoft.pretty.time.PrettyTime;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.rnm.keepintouch.data.Contact;
+import com.rnm.keepintouch.data.ContactEvent;
+import com.rnm.keepintouch.data.ContactPersist;
+import com.rnm.keepintouch.data.ContactsData;
 
 public class RecentContactWidgetProvider extends AppWidgetProvider {
 //	private static final String ACTION_CLICK = "ACTION_CLICK";
 
 	private static final String TAG = "recendcontactwidgetprovider";
 	
-	String name = "Nelson What";
-	String phone = "phone";
-	Long time = 22L;
+	public final static String UPDATE_CUSTOM = "com.rnm.keepintouch.UPDATE_CUSTOM";
 	
+	
+	public static void scheduleUpdate(Context pContext) {
+	    Log.d(TAG, "startAlarm");
+	    AlarmManager am = (AlarmManager) pContext.getSystemService(Context.ALARM_SERVICE);
 
+	    Intent intent = new Intent(UPDATE_CUSTOM);
+	    intent.setClass(pContext, RecentContactWidgetProvider.class);
+	    PendingIntent pi = PendingIntent.getBroadcast(pContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+	    am.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 5000, pi);
+	}
+	
+	
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds){
-		 
-		 Log.i(TAG, "on update widget: " + appWidgetIds.length);
+		super.onUpdate(context, appWidgetManager, appWidgetIds); 
+		
+		 Log.d(TAG, "on update widget: " + appWidgetIds.length);
 		 for (int widgetId : appWidgetIds) {
-			 Log.i(TAG, "looping through widgets");
+			 RemoteViews views = updateId(context, widgetId);
+			 if (views != null) appWidgetManager.updateAppWidget(widgetId, views);
+
+		 }
+		 
+		 scheduleUpdate(context);
+	}
+	
+	
+	public RemoteViews updateId(Context context, int widgetId) {
+		 Log.d(TAG, "looping through widgets");
+		 
+		 Contact contact = ContactPersist.getContact(context, widgetId+"");
+		 Log.d(TAG, "Contact: "+contact);
+		 if (contact != null) {
+			 ContactsData data = new ContactsData();
+			 data.updateContact(context, contact);
 			 
-			 RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-			          R.layout.widget_layout);
 			 
-			 remoteViews.setTextViewText(R.id.contacted_title, name);
-			 remoteViews.setTextViewText(R.id.contacted_name, name);
-			 remoteViews.setTextViewText(R.id.contacted_time, "" + time);
-			 
+			 RemoteViews remoteViews = setupRemoteViews(context, contact);
 			// Register an onClickListener
 //		      Intent intent = new Intent(context, RecentContactWidgetProvider.class);
 //
@@ -40,31 +75,49 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 //		      PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
 //		          0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 //		      remoteViews.setOnClickPendingIntent(R.id.contacted_name	, pendingIntent);
-		      appWidgetManager.updateAppWidget(widgetId, remoteViews);
+		      
+		      
+		      ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
+		      
+		      return remoteViews;
 		 }
+		 return null;
+		 
+	}
+	
+	
+	public static RemoteViews setupRemoteViews(Context context, Contact contact) {
+		 ContactEvent latest = contact.getLatest();
+		 RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+		          R.layout.widget_layout);
+		 
+		 remoteViews.setTextViewText(R.id.contacted_title, contact.name);
+		 remoteViews.setTextViewText(R.id.contacted_name, contact.name);
+		 if (latest != null) {
+			 PrettyTime p = new PrettyTime();
+			 remoteViews.setTextViewText(R.id.contacted_time, "" + p.format(new Date(latest.timestamp)));
+		 } else {
+			 remoteViews.setTextViewText(R.id.contacted_time, "never" );
+		 }
+		 return remoteViews;
 	}
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-//		Log.i(TAG, "onreceive widget");
-//        Bundle extras = intent.getExtras();
-        
-//        name = extras.getString("name");
-//        Log.i(TAG, "" + extras.getString("name"));
-        
-//        if(extras != null){
-//        	name= extras.getString("name");
-//        	phone = extras.getString("phone");
-//        	time = extras.getLong("days");
-//        	
-//        	Log.i(TAG, "" + extras.getString("name"));
-//	        if(extras.containsKey("contact")){
-//	        	Log.i(TAG, "containskey");
-//	        	Contact contact = (Contact) extras.getSerializable("contact");
-//	        	Log.i(TAG, contact.name);
-//	            this.contact = contact;
-//	        }
-//        }
-//        super.onReceive(context, intent);
-    }
+	 	Log.d(TAG, "on INTENT: " + intent);
+		super.onReceive(context, intent);
+		if (intent.getAction().equals(UPDATE_CUSTOM)) {
+		 	Log.d(TAG, "on Scheduling Update!");
+			ComponentName provider = new ComponentName(context, RecentContactWidgetProvider.class);
+			AppWidgetManager manager = AppWidgetManager.getInstance(context);
+			int[] ids = manager.getAppWidgetIds(provider);
+			for (int widgetId : ids) {
+				RemoteViews views = updateId(context, widgetId);
+				if (views != null)
+					manager.updateAppWidget(widgetId, views);
+
+			}
+			scheduleUpdate(context);
+		}
+	}
 }

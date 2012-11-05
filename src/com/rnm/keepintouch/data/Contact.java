@@ -3,6 +3,8 @@ package com.rnm.keepintouch.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.GsonBuilder;
+
 import android.net.Uri;
 
 public class Contact {
@@ -15,17 +17,8 @@ public class Contact {
 	public List<String> normphonenumber = new ArrayList<String>();
 	long lastcontact = Long.MIN_VALUE;
 	public List<ContactEvent> contactEvents = new ArrayList<ContactEvent>();
-	public Uri uri;
+	public String uri;
 	
-	private static final int MILLIS_IN_DAY = 24*60*60*1000;
-	
-	public long getDayDifference(){
-		if(lastcontact == Long.MIN_VALUE){
-			return Long.MIN_VALUE;
-		}
-		long days = (System.currentTimeMillis() - lastcontact)/(MILLIS_IN_DAY);
-		return days;
-	}
 	
 	public ContactEvent getLatest() {
 		if (contactEvents.isEmpty()) return null;
@@ -45,6 +38,15 @@ public class Contact {
 				+ ", phonenumber=" + phonenumber + ", normphonenumber="
 				+ normphonenumber + ", lastcontact=" + lastcontact
 				+ ", contactEvents=" + contactEvents + ", uri=" + uri + "]";
+	}
+	
+	
+	public String jsonize() {
+		return new GsonBuilder().serializeNulls().create().toJson(this);
+	}
+	
+	public static Contact fromjson(String json) {
+		return new GsonBuilder().create().fromJson(json, Contact.class);
 	}
 
 	

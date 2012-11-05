@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.QuickContact;
 import android.util.Log;
@@ -51,7 +52,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 //		badge.assignContactUri(contact.uri);
 //        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
 		ImageView badge = (ImageView)view.findViewById(R.id.contacted_badge);
-        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), contact.uri, true);
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), Uri.parse(contact.uri), true);
         Bitmap bitmap = BitmapFactory.decodeStream(input);
         if (bitmap != null)
         	badge.setImageBitmap(bitmap);
@@ -63,7 +64,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		view.findViewById(R.id.contacted_badge_box).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				QuickContact.showQuickContact(getContext(), v, contact.uri, QuickContact.MODE_LARGE, null);
+				QuickContact.showQuickContact(getContext(), v, Uri.parse(contact.uri), QuickContact.MODE_LARGE, null);
 			}
 		});
 

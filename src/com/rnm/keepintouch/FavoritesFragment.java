@@ -44,7 +44,8 @@ public class FavoritesFragment extends SherlockFragment implements OnItemClickLi
 		if (list != contactlist) {
 			contactlist = list;
 			contactsAdapter.clear();
-			contactsAdapter.addAll(list);
+			for (Contact c : list)
+				contactsAdapter.add(c);
 		}
 		contactsAdapter.notifyDataSetChanged();
 	}

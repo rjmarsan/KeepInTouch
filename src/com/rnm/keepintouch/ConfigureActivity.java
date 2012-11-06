@@ -87,7 +87,8 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 		@Override
 		protected void onPostExecute(ContactsData d){
 			data = d;
-	        contactsAdapter.addAll(data.getFavoriteContacts());
+			for (Contact c : data.getFavoriteContacts())
+				contactsAdapter.add(c);
 		}
     }
     

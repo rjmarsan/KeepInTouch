@@ -6,11 +6,13 @@ import java.util.List;
 
 import org.ocpsoft.pretty.time.PrettyTime;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.QuickContact;
 import android.util.Log;
@@ -36,6 +38,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		p.setLocale(context.getResources().getConfiguration().locale);
 	}
 
+	@TargetApi(14)
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		final Contact contact = (Contact) getItem(position);
@@ -52,7 +55,11 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 //		badge.assignContactUri(contact.uri);
 //        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
 		ImageView badge = (ImageView)view.findViewById(R.id.contacted_badge);
-        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), Uri.parse(contact.uri), true);
+        InputStream input;
+        if (Build.VERSION.SDK_INT >= 14)
+        	input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), Uri.parse(contact.uri), true);
+        else
+        	input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), Uri.parse(contact.uri));
         Bitmap bitmap = BitmapFactory.decodeStream(input);
         if (bitmap != null)
         	badge.setImageBitmap(bitmap);

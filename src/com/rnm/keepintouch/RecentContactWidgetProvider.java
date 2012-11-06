@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.ocpsoft.pretty.time.PrettyTime;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -17,6 +18,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -84,13 +86,18 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	}
 	
 	
+	@TargetApi(14)
 	public static RemoteViews setupRemoteViews(Context context, Contact contact) {
 		ContactEvent latest = contact.getLatest();
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
 				R.layout.widget_layout);
 
 		remoteViews.setTextViewText(R.id.contacted_name, contact.name);
-		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),Uri.parse(contact.uri), true);
+        InputStream input;
+        if (Build.VERSION.SDK_INT >= 14)
+        	input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), Uri.parse(contact.uri), true);
+        else
+        	input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), Uri.parse(contact.uri));
 		Bitmap bitmap = BitmapFactory.decodeStream(input);
 		if (bitmap != null)
 			remoteViews.setImageViewBitmap(R.id.contacted_badge, bitmap);

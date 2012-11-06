@@ -3,8 +3,6 @@ package com.rnm.keepintouch;
 import java.util.List;
 
 import android.app.Fragment;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,23 +60,15 @@ public class FavoritesFragment extends Fragment implements OnItemClickListener {
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		Contact contact = contactsAdapter.getItem(arg2);
+	public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+		Contact contact = contactsAdapter.getItem(position);
 		ContactEvent latest = contact.getLatest();
 		if (latest == null || latest.type == TYPE.SMS) {
-			sendSms(contact, latest);
+			Utils.sendSms(contact, latest, getActivity());
 		} else {
-			sendCall(contact, latest);
+			Utils.sendCall(contact, latest, getActivity());
 		}
 	}
 	
-	private void sendSms(Contact contact, ContactEvent event) {
-		String number = (event != null) ? event.number : contact.phonenumber.get(0); 
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + number)));
-	}
 	
-	private void sendCall(Contact contact, ContactEvent event) {
-		String number = (event != null) ? event.number : contact.phonenumber.get(0); 
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number)));
-	}
 }

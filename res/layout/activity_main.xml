@@ -2,10 +2,12 @@
     android:id="@+id/pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <!--
     <fragment android:name="com.rnm.keepintouch.FavoritesFragment"
               android:id="@+id/favorites_fragment"
               android:layout_width="match_parent"
               android:background="#f2f2f2"
-              android:layout_height="match_parent" />
+              android:layout_height="match_parent" />  -->
+    
     
 </LinearLayout>

@@ -61,7 +61,7 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
 		//appWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, 0);
-		RemoteViews remoteViews = RecentContactWidgetProvider.setupRemoteViews(this, contact);
+		RemoteViews remoteViews = RecentContactWidgetProvider.setupRemoteViews(this, contact, appWidgetManager.getAppWidgetInfo(mAppWidgetId).initialLayout);
 		appWidgetManager.updateAppWidget(mAppWidgetId, remoteViews);
 		
 		RecentContactWidgetProvider.scheduleUpdate(this);

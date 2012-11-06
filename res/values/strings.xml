@@ -8,4 +8,7 @@
     <string name="title_activity_main">Keep In Touch</string>
     <string name="no_fav_string">Looks like you don\'t have any favorite contacts, why don\'t you try adding some?</string>
 
+    <string name="widget_large">In Touch</string>
+    <string name="widget_medium">In Touch - Medium</string>
+    <string name="widget_small">In Touch - Small</string>
 </resources>

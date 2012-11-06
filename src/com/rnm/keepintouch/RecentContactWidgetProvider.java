@@ -36,6 +36,10 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	public final static String UPDATE_CUSTOM = "com.rnm.keepintouch.UPDATE_CUSTOM";
 	public final static String ACTION_CLICKED = "com.rnm.keepintouch.ACTION_CLICKED";
 	
+	public final static int WIDGET_LARGE = 3;
+	public final static int WIDGET_MEDIUM = 2;
+	public final static int WIDGET_SMALL = 1;
+	
 	
 	public static void scheduleUpdate(Context pContext) {
 	    Log.d(TAG, "startAlarm");
@@ -55,7 +59,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		
 		 Log.d(TAG, "on update widget: " + appWidgetIds.length);
 		 for (int widgetId : appWidgetIds) {
-			 RemoteViews views = updateId(context, widgetId);
+			 RemoteViews views = updateId(context, widgetId, appWidgetManager.getAppWidgetInfo(widgetId).initialLayout);
 			 if (views != null) appWidgetManager.updateAppWidget(widgetId, views);
 
 		 }
@@ -64,7 +68,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	}
 	
 	
-	public RemoteViews updateId(Context context, int widgetId) {
+	public RemoteViews updateId(Context context, int widgetId, int size) {
 		 Log.d(TAG, "looping through widgets");
 		 
 		 Contact contact = ContactPersist.getContact(context, widgetId+"");
@@ -74,7 +78,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			 data.updateContact(context, contact);
 			 
 			 
-			 RemoteViews remoteViews = setupRemoteViews(context, contact);
+			 RemoteViews remoteViews = setupRemoteViews(context, contact, size);
 			 //ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
 		      
 		      return remoteViews;
@@ -84,10 +88,9 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	}
 	
 	
-	public static RemoteViews setupRemoteViews(Context context, Contact contact) {
+	public static RemoteViews setupRemoteViews(Context context, Contact contact, int layout) {
 		ContactEvent latest = contact.getLatest();
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-				R.layout.widget_layout);
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layout);
 
 		remoteViews.setTextViewText(R.id.contacted_name, contact.name);
 		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),Uri.parse(contact.uri), true);
@@ -135,7 +138,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			AppWidgetManager manager = AppWidgetManager.getInstance(context);
 			int[] ids = manager.getAppWidgetIds(provider);
 			for (int widgetId : ids) {
-				RemoteViews views = updateId(context, widgetId);
+				RemoteViews views = updateId(context, widgetId, manager.getAppWidgetInfo(widgetId).initialLayout);
 				if (views != null)
 					manager.updateAppWidget(widgetId, views);
 			}

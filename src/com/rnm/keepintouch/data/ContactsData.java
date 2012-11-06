@@ -147,6 +147,7 @@ public class ContactsData {
 			updateCallLogForContact(context, contact, number);
 	}
 	private void updateCallLogForContact(Context context, Contact contact, String number) {
+		if (number == null) return; //nothing to do.
 		/**
 		 * http://malsandroid.blogspot.com/2010/06/accessing-call-logs.html
 		 */
@@ -157,7 +158,7 @@ public class ContactsData {
 		
 		Cursor c = context.getContentResolver().query(allCalls, 
         		new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION, "normalized_number"}/*null*/,
-        		null, null, null);
+        		"normalized_number = ?", new String[] {number}, null);
         		/*"normalized_number = ?", new String[] {number}, null);*/
         if (c.moveToFirst()) {
            do {

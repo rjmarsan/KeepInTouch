@@ -4,8 +4,8 @@
     <string name="title_section3">Recent</string>
     <string name="title_section2">Favorites</string>
     <string name="title_section1">Alphabetical</string>
-    <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Keep In Touch</string>
+    <string name="no_fav_string">Looks like you don\'t have any favorite contacts, why don\'t you try adding some?</string>
 
 </resources>

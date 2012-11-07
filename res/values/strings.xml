@@ -11,4 +11,14 @@
     <string name="widget_large">In Touch</string>
     <string name="widget_medium">In Touch - Medium</string>
     <string name="widget_small">In Touch - Small</string>
+    <string-array name="size_settings">
+        <item >Small</item>
+        <item >Medium</item>
+        <item >Large</item>
+    </string-array>
+    <string-array name="size_settings_values">
+        <item >1</item>
+        <item >2</item>
+        <item >3</item>
+    </string-array>
 </resources>

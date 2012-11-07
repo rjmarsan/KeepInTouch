@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.QuickContact;
 import android.util.Log;
@@ -27,41 +28,55 @@ import com.rnm.keepintouch.data.ContactEvent;
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
 public class ContactsAdapter extends ArrayAdapter<Contact> {
+	private static final String TAG = "ContactsAdapter";
 	Typeface thin;
 	PrettyTime p = new PrettyTime();
+	LayoutInflater inf;
 	
 	public ContactsAdapter(Context context, int textViewResourceId, List<Contact> objects) {
 		super(context, textViewResourceId, objects);
 		thin = Typeface.createFromAsset(context.getAssets(),"Roboto-Light.ttf");
 		p.setLocale(context.getResources().getConfiguration().locale);
+		inf = LayoutInflater.from(getContext());
+	}
+	
+	private static class ViewHolder{
+		ImageView badge;
+		TextView name;
+		TextView method;
+		TextView contacted;
+		ImageView direction;
+		View spacerTop;
+		View spacerBottom;
 	}
 
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		final Contact contact = (Contact) getItem(position);
-		if(view != null){
-			return view;
-		}
-		LayoutInflater inf = LayoutInflater.from(getContext());
+		ViewHolder holder;
 		
-		view = inf.inflate(R.layout.contact_list_item, null, false);
+		if(view == null){
+//			Log.d(TAG, "Null for " + contact.name);
+			view = inf.inflate(R.layout.contact_list_item, null, false);
+			holder = new ViewHolder();
+			holder.badge = (ImageView)view.findViewById(R.id.contacted_badge);
+			holder.name = (TextView)view.findViewById(R.id.contacted_name);
+			holder.method = (TextView)view.findViewById(R.id.contacted_method);		
+			holder.contacted = (TextView)view.findViewById(R.id.contacted_time);
+			holder.direction = (ImageView)view.findViewById(R.id.contacted_direction);
+			holder.spacerTop = view.findViewById(R.id.spacertop);
+			holder.spacerBottom = view.findViewById(R.id.spacerbottom);
+			view.setTag(holder);
+		}else{
+			holder = (ViewHolder) view.getTag();
+		}
 
 		
-		Log.d("ContactsAdapter", "Making badge " + contact.name);
+		Log.d(TAG, "Making badge " + contact.name);
 		
-//		QuickContactBadge badge = (QuickContactBadge)view.findViewById(R.id.contacted_badge);
-//		//badge.assignContactFromPhone("630 913 9425", true);
-//		badge.assignContactUri(contact.uri);
-//        badge.setMode(ContactsContract.QuickContact.MODE_LARGE);
-		ImageView badge = (ImageView)view.findViewById(R.id.contacted_badge);
-        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(getContext().getContentResolver(), Uri.parse(contact.uri), true);
-        Bitmap bitmap = BitmapFactory.decodeStream(input);
-        if (bitmap != null)
-        	badge.setImageBitmap(bitmap);
-//        else
-//        	badge.setImageResource(R.drawable.ic_contact_picture);
-		TextView name = (TextView)view.findViewById(R.id.contacted_name);
-		name.setText(contact.name);
+		new LoadPicTask(contact, holder, getContext()).execute();
+
+		holder.name.setText(contact.name);
 		
 		view.findViewById(R.id.contacted_badge_box).setOnClickListener(new OnClickListener() {
 			@Override
@@ -73,42 +88,66 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
         
 		ContactEvent mostrecent = contact.getLatest();
 		
-		if (position != 0) view.findViewById(R.id.spacertop).setVisibility(View.GONE);
-		else view.findViewById(R.id.spacertop).setVisibility(View.VISIBLE);
-		if (position != getCount()-1) view.findViewById(R.id.spacerbottom).setVisibility(View.GONE);
-		else view.findViewById(R.id.spacerbottom).setVisibility(View.VISIBLE);
+		if (position != 0) holder.spacerTop.setVisibility(View.GONE);
+		else holder.spacerTop.setVisibility(View.VISIBLE);
+		if (position != getCount()-1) holder.spacerBottom.setVisibility(View.GONE);
+		else holder.spacerBottom.setVisibility(View.VISIBLE);
 		
-		TextView method = (TextView)view.findViewById(R.id.contacted_method);		
-		TextView contacted = (TextView)view.findViewById(R.id.contacted_time);
-		ImageView direction = (ImageView)view.findViewById(R.id.contacted_direction);
 		
-		method.setTypeface(thin);
-		contacted.setTypeface(thin);
+		
+		holder.method.setTypeface(thin);
+		holder.contacted.setTypeface(thin);
 		
 		if (mostrecent != null) {
-			method.setVisibility(View.VISIBLE);
-			method.setText(mostrecent.type == TYPE.SMS ? "text message" : "phone call");
-			direction.setVisibility(View.VISIBLE);
-			direction.setImageResource(mostrecent.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
+			holder.method.setVisibility(View.VISIBLE);
+			holder.method.setText(mostrecent.type == TYPE.SMS ? "text message" : "phone call");
+			holder.direction.setVisibility(View.VISIBLE);
+			holder.direction.setImageResource(mostrecent.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
 			if(mostrecent.timestamp == Long.MIN_VALUE){
-				contacted.setText("never");
+				holder.contacted.setText("never");
 			}else{
-				contacted.setText(formatTimeAgo(mostrecent.timestamp));
+				holder.contacted.setText(formatTimeAgo(mostrecent.timestamp));
 			}
 		} else {
-			direction.setVisibility(View.GONE);
-			method.setText("");
-			method.setVisibility(View.GONE);
-			contacted.setText("never");
+			holder.direction.setVisibility(View.GONE);
+			holder.method.setText("");
+			holder.method.setVisibility(View.GONE);
+			holder.contacted.setText("never");
 		}
-		
 		
 		return view;
 	}
 	
+	private static class LoadPicTask extends AsyncTask<Void, Void, Bitmap>{
+		Contact contact;
+		ViewHolder holder;
+		Context context;
+		
+		public LoadPicTask(Contact contact, ViewHolder holder, Context context){
+			this.contact = contact;
+			this.holder = holder;
+			this.context = context;
+		}
+
+		@Override
+		protected Bitmap doInBackground(Void... param) {
+	        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), Uri.parse(contact.uri), true);
+	        
+			return BitmapFactory.decodeStream(input);
+		}
+		
+		@Override
+		protected void onPostExecute(Bitmap bitmap){
+			if (bitmap != null)
+	        	holder.badge.setImageBitmap(bitmap);
+			else
+				holder.badge.setImageResource(R.drawable.ic_contact_picture);
+		}
+		
+	}
 	
 	private String formatTimeAgo(long ago) {
-		Log.d("ContactsAdapter", "Formatting span "+ago);
+		Log.d(TAG, "Formatting span "+ago);
 		return p.format(new Date(ago));
 //		if (span < 1000*60) {
 //			return "a few seconds ago";

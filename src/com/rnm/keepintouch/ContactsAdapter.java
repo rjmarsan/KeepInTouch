@@ -39,11 +39,13 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		final Contact contact = (Contact) getItem(position);
-		if(view == null){
-			LayoutInflater inf = LayoutInflater.from(getContext());
-			
-			view = inf.inflate(R.layout.contact_list_item, null, false);
+		if(view != null){
+			return view;
 		}
+		LayoutInflater inf = LayoutInflater.from(getContext());
+		
+		view = inf.inflate(R.layout.contact_list_item, null, false);
+
 		
 		Log.d("ContactsAdapter", "Making badge " + contact.name);
 		

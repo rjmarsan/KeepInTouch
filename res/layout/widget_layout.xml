@@ -46,7 +46,7 @@
             android:textSize="22dp"
             android:gravity="center_vertical"
             android:textColor="#222222"
-            android:text="Last contact:"/>
+            android:text="@string/last_contact"/>
         <TextView
             android:id="@+id/contacted_method"
             android:layout_width="wrap_content"

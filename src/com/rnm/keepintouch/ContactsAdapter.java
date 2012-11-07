@@ -56,7 +56,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		ViewHolder holder;
 		
 		if(view == null){
-//			Log.d(TAG, "Null for " + contact.name);
 			view = inf.inflate(R.layout.contact_list_item, null, false);
 			holder = new ViewHolder();
 			holder.badge = (ImageView)view.findViewById(R.id.contacted_badge);
@@ -71,7 +70,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			holder = (ViewHolder) view.getTag();
 		}
 
-		
 		Log.d(TAG, "Making badge " + contact.name);
 		
 		new LoadPicTask(contact, holder, getContext()).execute();
@@ -84,7 +82,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 				QuickContact.showQuickContact(getContext(), v, Uri.parse(contact.uri), QuickContact.MODE_LARGE, null);
 			}
 		});
-
         
 		ContactEvent mostrecent = contact.getLatest();
 		
@@ -92,9 +89,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		else holder.spacerTop.setVisibility(View.VISIBLE);
 		if (position != getCount()-1) holder.spacerBottom.setVisibility(View.GONE);
 		else holder.spacerBottom.setVisibility(View.VISIBLE);
-		
-		
-		
+
 		holder.method.setTypeface(thin);
 		holder.contacted.setTypeface(thin);
 		

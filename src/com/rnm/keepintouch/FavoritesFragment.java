@@ -56,6 +56,9 @@ public class FavoritesFragment extends Fragment implements OnItemClickListener {
 			contactsAdapter.clear();
 			contactsAdapter.addAll(list);
 			contactsAdapter.notifyDataSetChanged();
+		}else{
+			error.setVisibility(View.INVISIBLE);
+			contactsAdapter.notifyDataSetChanged();
 		}
 	}
 

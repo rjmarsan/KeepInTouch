@@ -176,23 +176,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 	private String formatTimeAgo(long ago) {
 		Log.d(TAG, "Formatting span "+ago);
 		return p.format(new Date(ago));
-//		if (span < 1000*60) {
-//			return "a few seconds ago";
-//		} else if (span < 1000*60*5) {
-//			return "a few minutes ago";
-//		} else if (span < 1000*60*60) {
-//			return ""+Math.round(((double)span)/(1000*60.0))+" minutes ago";
-//		} else if (span < 1000*60*60*24) {
-//			return ""+Math.round(((double)span)/(1000*60*60.0))+" hours ago";
-//		} else if (span < 1000*60*60*24*30) {
-//			return ""+Math.round(((double)span)/(1000*60*60*24.0))+" days ago";
-//		}
-//		long value = Math.round(((double)span)/(1000*60*60*24*30.0));
-//		if (value <= 1)
-//			return "a month ago";
-//		else
-//			return ""+value+" months ago";
-
 	}
 
 }

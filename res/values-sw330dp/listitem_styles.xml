@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+
+This layout file is for phones and devices that can handle a width of larger than 330 - so it can fit the "Last Contacted" text. or at least close.
+
+ -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="ListItemTitleMedium" parent="ListItemText">
+        <item name="android:layout_height">30dp</item>
+        <item name="android:textSize">22dp</item>
+    </style>    
+    <style name="ListItemTextMedium" parent="ListItemText">
+        <item name="android:layout_height">26dp</item>
+        <item name="android:textSize">18dp</item>
+    </style>    
+    
+    
+</resources>

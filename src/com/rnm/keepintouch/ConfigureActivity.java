@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,11 +32,14 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		final int memClass = ((ActivityManager)getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+		final int cacheSize = 1024 * 1024 * memClass / 8;
+		
 		setContentView(R.layout.favorites_list);
 		ListView list = (ListView)findViewById(R.id.list);
 		list.setDividerHeight(0);
 		//list.setDivider(getResources().getDrawable(android.R.drawable.menu_frame));
-		contactsAdapter = new ContactsAdapter(this, R.layout.contact_list_item, new ArrayList<Contact>());
+		contactsAdapter = new ContactsAdapter(this, new Cache(cacheSize), R.layout.contact_list_item, new ArrayList<Contact>());
 		list.setAdapter(contactsAdapter);
 		list.setOnItemClickListener(this);
 		list.setEmptyView(findViewById(R.id.empty));

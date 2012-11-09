@@ -32,12 +32,14 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 	Typeface thin;
 	PrettyTime p = new PrettyTime();
 	LayoutInflater inf;
+	Cache mCache;
 	
-	public ContactsAdapter(Context context, int textViewResourceId, List<Contact> objects) {
+	public ContactsAdapter(Context context, Cache cache, int textViewResourceId, List<Contact> objects) {
 		super(context, textViewResourceId, objects);
 		thin = Typeface.createFromAsset(context.getAssets(),"Roboto-Light.ttf");
 		p.setLocale(context.getResources().getConfiguration().locale);
 		inf = LayoutInflater.from(getContext());
+		mCache = cache;
 	}
 	
 	private static class ViewHolder{
@@ -48,6 +50,8 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		ImageView direction;
 		View spacerTop;
 		View spacerBottom;
+		String contactUri;
+		LoadPicTask task;
 	}
 
 	@Override
@@ -72,7 +76,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 
 		Log.d(TAG, "Making badge " + contact.name);
 		
-		new LoadPicTask(contact, holder, getContext()).execute();
+		setContactImage(holder, contact);
 
 		holder.name.setText(contact.name);
 		
@@ -113,30 +117,58 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		return view;
 	}
 	
+	
+	private void setContactImage(ViewHolder holder, Contact contact) {
+		
+		if (holder.task != null) holder.task.cancel(true);
+		holder.contactUri = contact.id;
+		
+		Bitmap bitmap = mCache.getBitmapFromMemCache(contact.id);
+		if (bitmap == null) {
+			holder.badge.setImageResource(R.drawable.ic_contact_picture);
+			holder.task = new LoadPicTask(contact, holder, getContext(), contact.id, mCache);
+			holder.task.execute();
+		} else {
+			holder.badge.setImageBitmap(bitmap);
+		}
+		
+
+	}
+	
 	private static class LoadPicTask extends AsyncTask<Void, Void, Bitmap>{
 		Contact contact;
 		ViewHolder holder;
 		Context context;
+		String contactUid;
+		Cache mCache;
 		
-		public LoadPicTask(Contact contact, ViewHolder holder, Context context){
+		public LoadPicTask(Contact contact, ViewHolder holder, Context context, String contactUid, Cache cache){
 			this.contact = contact;
 			this.holder = holder;
 			this.context = context;
+			this.contactUid = contactUid;
+			this.mCache = cache;
 		}
 
 		@Override
 		protected Bitmap doInBackground(Void... param) {
 	        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), Uri.parse(contact.uri), true);
 	        
-			return BitmapFactory.decodeStream(input);
+			Bitmap bitmap =  BitmapFactory.decodeStream(input);
+			
+			if (bitmap != null) mCache.addBitmapToMemoryCache(contactUid, bitmap);
+			
+			return bitmap;
 		}
 		
 		@Override
 		protected void onPostExecute(Bitmap bitmap){
-			if (bitmap != null)
-	        	holder.badge.setImageBitmap(bitmap);
-			else
-				holder.badge.setImageResource(R.drawable.ic_contact_picture);
+			if (holder.contactUri.equals(contactUid)) {
+				if (bitmap != null)
+		        	holder.badge.setImageBitmap(bitmap);
+				else
+					holder.badge.setImageResource(R.drawable.ic_contact_picture);
+			}
 		}
 		
 	}

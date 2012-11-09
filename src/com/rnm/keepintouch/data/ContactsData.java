@@ -18,6 +18,7 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.rnm.keepintouch.R;
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
 public class ContactsData {
@@ -40,7 +41,7 @@ public class ContactsData {
 		try {
 			updateCallLogIntoList(context, contacts);
 		} catch (Exception e) {
-			showToast(context, "Error scanning Call Log");
+			showToast(context, R.string.error_calllog);
 		}
 
 		
@@ -50,7 +51,7 @@ public class ContactsData {
 		try {  
 			updateSMSIntoList(context, contacts);
 		} catch (Exception e) {
-			showToast(context, "Error scanning SMS");
+			showToast(context, R.string.error_sms);
 		}
 
 //		} catch (Exception e) {
@@ -66,19 +67,19 @@ public class ContactsData {
 		try {
 			updateCallLogForContact(context, contact);
 		} catch (Exception e) {
-			showToast(context, "Error scanning Call Log");
+			showToast(context, R.string.error_calllog);
 		}
 		
 		try {
 			updateSMSForContact(context, contact);
 		} catch (Exception e) {
-			showToast(context, "Error scanning SMS");
+			showToast(context, R.string.error_sms);
 		}
 
 		Log.d("Contacts", "************************************ Finishing contacts. elapsed time: "+(System.currentTimeMillis()-start));
 	}
 	
-	private void showToast(final Context context,final String message) {
+	private void showToast(final Context context, final int message) {
 		if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
 			Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 		} else if (context instanceof Activity) {

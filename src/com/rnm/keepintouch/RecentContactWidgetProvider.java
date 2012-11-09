@@ -87,13 +87,17 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		 
 	}
 	
+	private static String r(Context context, int id) {
+		return context.getResources().getString(id);
+	}
 	
-	public static RemoteViews setupRemoteViews(Context context, Contact contact, int layout) {
+	
+	public static RemoteViews setupRemoteViews(Context c, Contact contact, int layout) {
 		ContactEvent latest = contact.getLatest();
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layout);
+		RemoteViews remoteViews = new RemoteViews(c.getPackageName(), layout);
 
 		remoteViews.setTextViewText(R.id.contacted_name, contact.name);
-		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),Uri.parse(contact.uri), true);
+		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(c.getContentResolver(),Uri.parse(contact.uri), true);
 		Bitmap bitmap = BitmapFactory.decodeStream(input);
 		if (bitmap != null)
 			remoteViews.setImageViewBitmap(R.id.contacted_badge, bitmap);
@@ -101,11 +105,11 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			remoteViews.setImageViewResource(R.id.contacted_badge, R.drawable.ic_contact_picture);		 
 		 if (latest != null) {
 			 PrettyTime p = new PrettyTime();
-			 remoteViews.setTextViewText(R.id.contacted_method, latest.type == TYPE.SMS ? "text message" : "phone call");
+			 remoteViews.setTextViewText(R.id.contacted_method, latest.type == TYPE.SMS ? r(c,R.string.text_message) : r(c,R.string.phone_call));
 			 remoteViews.setTextViewText(R.id.contacted_time, "" + p.format(new Date(latest.timestamp)));
 			 remoteViews.setImageViewResource(R.id.contacted_direction, latest.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
 		 } else {
-			 remoteViews.setTextViewText(R.id.contacted_time, "never" );
+			 remoteViews.setTextViewText(R.id.contacted_time, r(c,R.string.never));
 			 remoteViews.setViewVisibility(R.id.contacted_method, View.GONE);
 		 }
 
@@ -118,11 +122,11 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		} else {
 			i = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + number));
 		}
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, PendingIntent.FLAG_ONE_SHOT, i, 0);
+		PendingIntent pendingIntent = PendingIntent.getActivity(c, PendingIntent.FLAG_ONE_SHOT, i, 0);
 		remoteViews.setOnClickPendingIntent(R.id.contacted_mainbox,pendingIntent);
 		
 		/** Setup the icon box **/
-		PendingIntent appIntent = PendingIntent.getActivity(context, PendingIntent.FLAG_ONE_SHOT, new Intent(context, MainActivity.class), 0);
+		PendingIntent appIntent = PendingIntent.getActivity(c, PendingIntent.FLAG_ONE_SHOT, new Intent(c, MainActivity.class), 0);
 		remoteViews.setOnClickPendingIntent(R.id.contacted_badge_box, appIntent);
 
 		return remoteViews;

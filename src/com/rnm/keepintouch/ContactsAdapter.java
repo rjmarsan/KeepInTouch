@@ -99,11 +99,11 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		
 		if (mostrecent != null) {
 			holder.method.setVisibility(View.VISIBLE);
-			holder.method.setText(mostrecent.type == TYPE.SMS ? "text message" : "phone call");
+			holder.method.setText(mostrecent.type == TYPE.SMS ? R.string.text_message : R.string.phone_call);
 			holder.direction.setVisibility(View.VISIBLE);
 			holder.direction.setImageResource(mostrecent.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
 			if(mostrecent.timestamp == Long.MIN_VALUE){
-				holder.contacted.setText("never");
+				holder.contacted.setText(R.string.never);
 			}else{
 				holder.contacted.setText(formatTimeAgo(mostrecent.timestamp));
 			}
@@ -111,7 +111,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			holder.direction.setVisibility(View.GONE);
 			holder.method.setText("");
 			holder.method.setVisibility(View.GONE);
-			holder.contacted.setText("never");
+			holder.contacted.setText(R.string.never);
 		}
 		
 		return view;

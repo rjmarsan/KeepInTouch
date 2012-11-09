@@ -5,15 +5,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Looper;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
 
@@ -21,23 +24,35 @@ public class ContactsData {
 
 	List<Contact> contacts;
 	
-	public void update(Context context) {
+	public void update(Activity context) {
 		Log.d("Contacts", "************************************ Starting run...");
 		long start = System.currentTimeMillis();
 		this.contacts = gatherData(context, contacts);
 		Log.d("Contacts", "************************************ Finishing contacts. elapsed time: "+(System.currentTimeMillis()-start));
 	}
 	
-	public List<Contact> gatherData(Context context, List<Contact> contacts) {
+	public List<Contact> gatherData(Activity context, List<Contact> contacts) {
 		  long start = System.currentTimeMillis();
 		if (contacts == null) contacts = getContacts(context);
 		  Log.d("Contacts", "********* contactsmap1.elapsed time: "+(System.currentTimeMillis()-start));
 		  start = System.currentTimeMillis();
-		updateCallLogIntoList(context, contacts);
+		  
+		try {
+			updateCallLogIntoList(context, contacts);
+		} catch (Exception e) {
+			showToast(context, "Error scanning Call Log");
+		}
+
+		
 		  Log.d("Contacts", "********* calllog.     elapsed time: "+(System.currentTimeMillis()-start));
 		  start = System.currentTimeMillis();
 //		try {
+		try {  
 			updateSMSIntoList(context, contacts);
+		} catch (Exception e) {
+			showToast(context, "Error scanning SMS");
+		}
+
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //		}
@@ -48,9 +63,29 @@ public class ContactsData {
 	public void updateContact(Context context, Contact contact) {
 		Log.d("Contacts", "************************************ Starting run...");
 		long start = System.currentTimeMillis();
-		updateCallLogForContact(context, contact);
-		updateSMSForContact(context, contact);
+		try {
+			updateCallLogForContact(context, contact);
+		} catch (Exception e) {
+			showToast(context, "Error scanning Call Log");
+		}
+		
+		try {
+			updateSMSForContact(context, contact);
+		} catch (Exception e) {
+			showToast(context, "Error scanning SMS");
+		}
+
 		Log.d("Contacts", "************************************ Finishing contacts. elapsed time: "+(System.currentTimeMillis()-start));
+	}
+	
+	private void showToast(final Context context,final String message) {
+		if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+			Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+		} else if (context instanceof Activity) {
+			((Activity)context).runOnUiThread(new Runnable() { public void run() {
+				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+			}});
+		}
 	}
 	
 	

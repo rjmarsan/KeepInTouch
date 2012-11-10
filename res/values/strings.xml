@@ -24,7 +24,9 @@
     <string name="last_contact">Last contact:</string>
     <string name="never">never</string>
     <string name="text_message">text message</string>
+    <string name="text_message_short">text msg</string>
     <string name="phone_call">phone call</string>
+    <string name="phone_call_short">phone call</string>
     
     
     

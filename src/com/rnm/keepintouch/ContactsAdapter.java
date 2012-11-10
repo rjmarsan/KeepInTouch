@@ -152,9 +152,12 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 
 		@Override
 		protected Bitmap doInBackground(Void... param) {
-	        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), Uri.parse(contact.uri), true);
-	        
-			Bitmap bitmap =  BitmapFactory.decodeStream(input);
+//	        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), Uri.parse(contact.uri), true);
+//	        
+//			Bitmap bitmap =  BitmapFactory.decodeStream(input);
+			
+			Bitmap bitmap = ItemUIHelper.getBitmap(context, contact.uri, ItemUIHelper.ICON_LARGE);
+
 			
 			if (bitmap != null) mCache.addBitmapToMemoryCache(contactUid, bitmap);
 			

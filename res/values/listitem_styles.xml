@@ -3,22 +3,38 @@
     <style name="ListItemText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:textColor">#222222</item>
+        <item name="android:gravity">bottom</item>
         <item name="android:singleLine">true</item>
         <item name="android:textStyle">normal</item>
     </style>
-    <style name="ListItemTitleMedium" parent="ListItemText">
+    <style name="ListItemTitleLarge" parent="ListItemText">
         <item name="android:layout_height">30dp</item>
         <item name="android:textSize">20dp</item>
     </style>    
-    <style name="ListItemTextMedium" parent="ListItemText">
+    <style name="ListItemTextLarge" parent="ListItemText">
         <item name="android:layout_height">26dp</item>
         <item name="android:textSize">17dp</item>
     </style>    
-    <style name="ListItemTitleTiny" parent="ListItemText">
-        <item name="android:layout_height">16dp</item>
+    
+    
+    <style name="ListItemTitleMedium" parent="ListItemText">
+        <item name="android:layout_height">21dp</item>
+        <item name="android:textSize">18dp</item>
+    </style>    
+    <style name="ListItemTextMedium" parent="ListItemText">
+        <item name="android:layout_height">18dp</item>
         <item name="android:textSize">13dp</item>
     </style>    
-    <style name="ListItemTextTiny" parent="ListItemText">
+    <style name="OutgoingIndicatorMedium" parent="ListItemText">
+        <item name="android:layout_height">18dp</item>
+        <item name="android:layout_width">18dp</item>
+    </style>    
+    
+    <style name="ListItemTitleSmall" parent="ListItemText">
+        <item name="android:layout_height">18dp</item>
+        <item name="android:textSize">14dp</item>
+    </style>    
+    <style name="ListItemTextSmall" parent="ListItemText">
         <item name="android:layout_height">16dp</item>
         <item name="android:textSize">10dp</item>
     </style>    

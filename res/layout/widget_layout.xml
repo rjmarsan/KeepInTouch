@@ -6,7 +6,9 @@
     android:background="@drawable/tilebackground"
     android:padding="16dp">
 
-	<include layout="@layout/contact_badge"/>
+	<include layout="@layout/contact_badge"
+	    android:layout_width="120dp"
+	    android:layout_height="120dp"/>
     
     <LinearLayout
 	    android:layout_width="wrap_content"
@@ -17,15 +19,15 @@
 	    
         <TextView
             android:id="@+id/contacted_title"
-            style="@style/ListItemTitleMedium"
+            style="@style/ListItemTitleLarge"
             android:text="@string/last_contact"/>
         <TextView
             android:id="@+id/contacted_method"
-            style="@style/ListItemTextMedium"
+            style="@style/ListItemTextLarge"
             android:text="phone call"/>
         <TextView
             android:id="@+id/contacted_time"
-            style="@style/ListItemTextMedium"
+            style="@style/ListItemTextLarge"
             android:text="17 days ago"/>
         <ImageView 
             android:id="@+id/contacted_direction"

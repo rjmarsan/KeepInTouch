@@ -96,16 +96,29 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		ContactEvent latest = contact.getLatest();
 		RemoteViews remoteViews = new RemoteViews(c.getPackageName(), layout);
 
-		remoteViews.setTextViewText(R.id.contacted_name, contact.name);
-		InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(c.getContentResolver(),Uri.parse(contact.uri), true);
-		Bitmap bitmap = BitmapFactory.decodeStream(input);
+		Bitmap bitmap;
+		if (layout == R.layout.widget_layout) {
+			bitmap = ItemUIHelper.getBitmap(c, contact.uri, ItemUIHelper.ICON_LARGE);
+			remoteViews.setTextViewText(R.id.contacted_name, contact.name);
+		} else {
+			bitmap = ItemUIHelper.getBitmap(c, contact.uri, ItemUIHelper.ICON_SMALL);
+			remoteViews.setViewVisibility(R.id.contacted_name, View.GONE);
+			String name = (layout == R.layout.widget_layout_2by1) ? ItemUIHelper.getFirstName(contact.name) : contact.name;
+			remoteViews.setTextViewText(R.id.contacted_title, name);
+		}
 		if (bitmap != null)
 			remoteViews.setImageViewBitmap(R.id.contacted_badge, bitmap);
 		else
 			remoteViews.setImageViewResource(R.id.contacted_badge, R.drawable.ic_contact_picture);		 
 		 if (latest != null) {
 			 PrettyTime p = new PrettyTime();
-			 remoteViews.setTextViewText(R.id.contacted_method, latest.type == TYPE.SMS ? r(c,R.string.text_message) : r(c,R.string.phone_call));
+			 String text = r(c,R.string.text_message);
+			 String call = r(c,R.string.phone_call);
+			 if (layout == R.layout.widget_layout_2by1) {
+				 text = r(c,R.string.text_message_short);
+				 call = r(c,R.string.phone_call_short);
+			 }
+			 remoteViews.setTextViewText(R.id.contacted_method, latest.type == TYPE.SMS ? text : call);
 			 remoteViews.setTextViewText(R.id.contacted_time, "" + p.format(new Date(latest.timestamp)));
 			 remoteViews.setImageViewResource(R.id.contacted_direction, latest.isOutgoing() ? R.drawable.outgoing : R.drawable.incoming);
 		 } else {
@@ -131,6 +144,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 
 		return remoteViews;
 	}
+	
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {

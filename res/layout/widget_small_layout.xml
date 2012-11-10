@@ -1,0 +1,79 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contacted_mainbox"
+    android:layout_width="match_parent"
+    android:layout_height="92dp"
+    android:orientation="horizontal"
+    android:background="@drawable/tilebackground"
+    android:padding="8dp">
+
+    <RelativeLayout 
+	    android:id="@+id/contacted_badge_box"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        >
+	    <ImageView
+	        android:id="@+id/contacted_badge"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:src="@drawable/ic_contact_picture"/>
+    	<TextView
+	        android:id="@+id/contacted_name"
+	        android:layout_width="match_parent"
+	        android:layout_height="30dp"
+	        android:visibility="gone"
+	        />
+    </RelativeLayout>
+
+    <LinearLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical"
+	    android:paddingLeft="16dp"
+	    android:paddingTop="8dp">
+	    
+        <TextView
+            android:id="@+id/contacted_title"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textStyle="normal"
+            android:textSize="22dp"
+            android:gravity="center_vertical"
+            android:textColor="#222222"
+            android:text="@string/last_contact"/>
+        <LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+	        <TextView
+	            android:id="@+id/contacted_method"
+	            android:layout_width="wrap_content"
+	            android:layout_height="26dp"
+	            android:gravity="center_vertical"
+	            android:textSize="18dp"
+	            android:textColor="#222222"
+	            android:singleLine="true"
+	            android:text="phone call"/>
+	        <ImageView 
+	            android:id="@+id/contacted_direction"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:paddingLeft="2dp"
+	            />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/contacted_time"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:gravity="center_vertical"
+            android:textSize="18dp"
+            android:textColor="#222222"
+            android:singleLine="true"
+            android:text="17 days ago"/>
+            
+        
+    </LinearLayout>
+    
+    
+
+</LinearLayout>

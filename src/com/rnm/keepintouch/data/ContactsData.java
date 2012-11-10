@@ -87,6 +87,7 @@ public class ContactsData {
 				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 			}});
 		}
+		Log.e("Contacts", "Error: "+message);
 	}
 	
 	

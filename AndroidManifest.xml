@@ -42,7 +42,15 @@
 		    <meta-data android:name="android.appwidget.provider"
 		               android:resource="@xml/widget_info_medium" />
 		</receiver>
-				
+		<receiver android:name=".SmallWidget" android:label="@string/widget_small">
+		    <intent-filter>
+		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+		        <action android:name="com.rnm.keepintouch.UPDATE_CUSTOM" />
+		    </intent-filter>
+		    <meta-data android:name="android.appwidget.provider"
+		               android:resource="@xml/widget_info_2by1" />
+		</receiver>
+						
 		<activity android:name=".ConfigureActivity">
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>

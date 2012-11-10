@@ -1,6 +1,5 @@
 package com.rnm.keepintouch;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,10 +14,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.SystemClock;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.QuickContact;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -78,7 +77,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			 data.updateContact(context, contact);
 			 
 			 
-			 RemoteViews remoteViews = setupRemoteViews(context, contact, size);
+			 RemoteViews remoteViews = setupRemoteViews(context, contact, size, widgetId);
 			 //ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
 		      
 		      return remoteViews;
@@ -92,7 +91,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	}
 	
 	
-	public static RemoteViews setupRemoteViews(Context c, Contact contact, int layout) {
+	public static RemoteViews setupRemoteViews(Context c, Contact contact, int layout, int id) {
 		ContactEvent latest = contact.getLatest();
 		RemoteViews remoteViews = new RemoteViews(c.getPackageName(), layout);
 
@@ -140,7 +139,11 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		remoteViews.setOnClickPendingIntent(R.id.contacted_mainbox,pendingIntent);
 		
 		/** Setup the icon box **/
-		PendingIntent appIntent = PendingIntent.getActivity(c, PendingIntent.FLAG_ONE_SHOT, new Intent(c, MainActivity.class), 0);
+		//PendingIntent appIntent = PendingIntent.getActivity(c, PendingIntent.FLAG_ONE_SHOT, new Intent(c, MainActivity.class), 0);
+		Intent contactintent = new Intent(c, RecentContactWidgetProvider.class);
+		contactintent.setAction(ACTION_CLICKED);
+		contactintent.putExtra("uri", contact.uri);
+		PendingIntent appIntent = PendingIntent.getBroadcast(c, id, contactintent, PendingIntent.FLAG_UPDATE_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.contacted_badge_box, appIntent);
 
 		return remoteViews;
@@ -151,6 +154,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 	public void onReceive(Context context, Intent intent) {
 	 	Log.d(TAG, "on INTENT: " + intent);
 		super.onReceive(context, intent);
+		
 		if (intent.getAction().equals(UPDATE_CUSTOM)) {
 		 	Log.d(TAG, "on Scheduling Update!");
 			ComponentName provider = new ComponentName(context, RecentContactWidgetProvider.class);
@@ -165,6 +169,11 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 			for (int i : ids) ok.add(i+"");
 			ContactPersist.clearAll(context, ok);
 			scheduleUpdate(context);
+		} else if (intent.getAction().equals(ACTION_CLICKED)) {
+			String uri = intent.getStringExtra("uri");
+			QuickContact.showQuickContact(context, intent.getSourceBounds(), Uri.parse(uri), QuickContact.MODE_LARGE, null);
 		}
+
+		
 	}
 }

@@ -21,7 +21,7 @@
         <item >2</item>
         <item >3</item>
     </string-array>
-    <string name="last_contact">Last contact:</string>
+    <string name="last_contact">Last contact</string>
     <string name="never">never</string>
     <string name="text_message">text message</string>
     <string name="text_message_short">text msg</string>

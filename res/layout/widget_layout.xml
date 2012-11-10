@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="152dp"
     android:orientation="horizontal"
-    android:background="@drawable/tilebackground"
+    android:background="@drawable/tilebg_statelist"
     android:padding="16dp">
 
 	<include layout="@layout/contact_badge"

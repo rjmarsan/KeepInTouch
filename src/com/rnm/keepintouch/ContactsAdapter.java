@@ -48,8 +48,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		TextView method;
 		TextView contacted;
 		ImageView direction;
-		View spacerTop;
-		View spacerBottom;
 		String contactUri;
 		LoadPicTask task;
 	}
@@ -67,8 +65,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			holder.method = (TextView)view.findViewById(R.id.contacted_method);		
 			holder.contacted = (TextView)view.findViewById(R.id.contacted_time);
 			holder.direction = (ImageView)view.findViewById(R.id.contacted_direction);
-			holder.spacerTop = view.findViewById(R.id.spacertop);
-			holder.spacerBottom = view.findViewById(R.id.spacerbottom);
 			view.setTag(holder);
 		}else{
 			holder = (ViewHolder) view.getTag();
@@ -89,11 +85,6 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
         
 		ContactEvent mostrecent = contact.getLatest();
 		
-		if (position != 0) holder.spacerTop.setVisibility(View.GONE);
-		else holder.spacerTop.setVisibility(View.VISIBLE);
-		if (position != getCount()-1) holder.spacerBottom.setVisibility(View.GONE);
-		else holder.spacerBottom.setVisibility(View.VISIBLE);
-
 		holder.method.setTypeface(thin);
 		holder.contacted.setTypeface(thin);
 		

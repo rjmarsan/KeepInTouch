@@ -34,6 +34,7 @@
 		    <meta-data android:name="android.appwidget.provider"
 		               android:resource="@xml/widget_info" />
 		</receiver>
+<!--
 		<receiver android:name=".MediumWidget" android:label="@string/widget_medium">
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -42,6 +43,7 @@
 		    <meta-data android:name="android.appwidget.provider"
 		               android:resource="@xml/widget_info_medium" />
 		</receiver>
+-->
 		<receiver android:name=".SmallWidget" android:label="@string/widget_small">
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

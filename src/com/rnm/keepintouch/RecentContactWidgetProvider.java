@@ -124,6 +124,7 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		 } else {
 			 remoteViews.setTextViewText(R.id.contacted_time, r(c,R.string.never));
 			 remoteViews.setViewVisibility(R.id.contacted_method, View.GONE);
+			 remoteViews.setViewVisibility(R.id.contacted_direction, View.GONE);
 		 }
 
 		 /** setup the main box **/

@@ -18,6 +18,7 @@ import com.rnm.keepintouch.data.ContactsData;
 
 public class MainActivity extends Activity {
 
+	public final static String FAV_FRAG = "favfrag";
     ContactsData data;
     List<Contact> fav = new ArrayList<Contact>();
     FavoritesFragment main;
@@ -27,17 +28,29 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-		
+		        
+        main = (FavoritesFragment) getFragmentManager().findFragmentByTag(FAV_FRAG);
+        if (main == null) {
+	        main = new FavoritesFragment();
+	        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+	        transaction.add(android.R.id.content, main, FAV_FRAG);
+	        transaction.commit();
+        }
         
-//        main = (FavoritesFragment) getFragmentManager().findFragmentById(R.id.favorites_fragment);
-        main = new FavoritesFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.add(android.R.id.content, main);
-        transaction.commit();
+        data = (ContactsData) getLastNonConfigurationInstance();
+
+
         
         
         getActionBar().setDisplayShowTitleEnabled(false);
     }
+    
+    
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return data;
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

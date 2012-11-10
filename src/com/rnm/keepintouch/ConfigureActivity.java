@@ -12,9 +12,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 import android.widget.RemoteViews;
 
 import com.rnm.keepintouch.data.Contact;
@@ -36,8 +36,8 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 		final int cacheSize = 1024 * 1024 * memClass / 8;
 		
 		setContentView(R.layout.favorites_list);
-		ListView list = (ListView)findViewById(R.id.list);
-		list.setDividerHeight(0);
+		AbsListView list = (AbsListView)findViewById(R.id.list);
+		//list.setDividerHeight(0);
 		//list.setDivider(getResources().getDrawable(android.R.drawable.menu_frame));
 		contactsAdapter = new ContactsAdapter(this, new Cache(cacheSize), R.layout.contact_list_item, new ArrayList<Contact>());
 		list.setAdapter(contactsAdapter);

@@ -5,6 +5,7 @@ import java.util.Set;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.util.Log;
 
 public class ContactPersist {
 	public final static String PREFS_KEY = "widgets_prefs";
@@ -29,6 +30,7 @@ public class ContactPersist {
 		Editor edit = prefs.edit();
 		for (String key : prefs.getAll().keySet()) {
 			if (ok.contains(key) == false) {
+				Log.d("ContactsPersist", "!!!!!!!!!!!!!!!!!!! REMOVING !!!!!!!!!!!!!!!!!!!!!! "+key);
 				edit.remove(key);
 			}
 		}

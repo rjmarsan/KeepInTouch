@@ -9,9 +9,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -42,8 +42,8 @@ public class FavoritesFragment extends Fragment implements OnItemClickListener {
 		View v = inflater.inflate(R.layout.favorites_list, null);
 		error = (TextView)v.findViewById(R.id.no_fav);
 		empty = (ProgressBar)v.findViewById(R.id.empty);
-		ListView listView = (ListView)v.findViewById(R.id.list);
-		listView.setDividerHeight(0);
+		AbsListView listView = (AbsListView)v.findViewById(R.id.list);
+		//listView.setDividerHeight(0);
 		//list.setDivider(getResources().getDrawable(android.R.drawable.menu_frame));
 		contactsAdapter = new ContactsAdapter(getActivity(), new Cache(cacheSize), R.layout.contact_list_item, ((MainActivity)getActivity()).fav);
 		listView.setAdapter(contactsAdapter);

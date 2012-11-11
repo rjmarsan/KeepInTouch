@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.gson.GsonBuilder;
 
-public class Contact {
+public class Contact {	
 	public String name;
 	public boolean starred;
 	public String id;
@@ -16,6 +16,7 @@ public class Contact {
 	long lastcontact = Long.MIN_VALUE;
 	public List<ContactEvent> contactEvents = new ArrayList<ContactEvent>();
 	public String uri;
+	public boolean isPlaceholderForLatest = false;
 	
 	
 	public ContactEvent getLatest() {

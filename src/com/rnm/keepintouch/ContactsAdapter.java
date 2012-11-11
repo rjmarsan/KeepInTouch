@@ -46,6 +46,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 		ImageView badge;
 		TextView name;
 		TextView method;
+		TextView title;
 		TextView contacted;
 		ImageView direction;
 		String contactUri;
@@ -62,6 +63,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			holder = new ViewHolder();
 			holder.badge = (ImageView)view.findViewById(R.id.contacted_badge);
 			holder.name = (TextView)view.findViewById(R.id.contacted_name);
+			holder.title = (TextView)view.findViewById(R.id.contacted_title);
 			holder.method = (TextView)view.findViewById(R.id.contacted_method);		
 			holder.contacted = (TextView)view.findViewById(R.id.contacted_time);
 			holder.direction = (ImageView)view.findViewById(R.id.contacted_direction);
@@ -70,24 +72,52 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			holder = (ViewHolder) view.getTag();
 		}
 
+		holder.method.setTypeface(thin);
+		holder.contacted.setTypeface(thin);
+		
 		Log.d(TAG, "Making badge " + contact.name);
 		
+		
+		if (contact.isPlaceholderForLatest) {
+			setupLatestContact(holder);
+		} else {
+			setupContact(holder, contact, view);
+			ContactEvent mostrecent = contact.getLatest();		
+			fillInEvent(holder, mostrecent);
+		}
+		
+		return view;
+	}
+	
+	private void setupContact(ViewHolder holder, final Contact contact, View view) {
 		setContactImage(holder, contact);
 
 		holder.name.setText(contact.name);
-		
 		view.findViewById(R.id.contacted_badge_box).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				QuickContact.showQuickContact(getContext(), v, Uri.parse(contact.uri), QuickContact.MODE_LARGE, null);
 			}
 		});
-        
-		ContactEvent mostrecent = contact.getLatest();
+		holder.title.setText(R.string.last_contact);
+	}
+	
+	private void setContactImage(ViewHolder holder, Contact contact) {
 		
-		holder.method.setTypeface(thin);
-		holder.contacted.setTypeface(thin);
+		if (holder.task != null) holder.task.cancel(true);
+		holder.contactUri = contact.id;
 		
+		Bitmap bitmap = mCache.getBitmapFromMemCache(contact.id);
+		if (bitmap == null) {
+			holder.badge.setImageResource(R.drawable.ic_contact_picture);
+			holder.task = new LoadPicTask(contact, holder, getContext(), contact.id, mCache);
+			holder.task.execute();
+		} else {
+			holder.badge.setImageBitmap(bitmap);
+		}
+	}
+	
+	private void fillInEvent(ViewHolder holder, ContactEvent mostrecent) {
 		if (mostrecent != null) {
 			holder.method.setVisibility(View.VISIBLE);
 			holder.method.setText(mostrecent.type == TYPE.SMS ? R.string.text_message : R.string.phone_call);
@@ -104,26 +134,14 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
 			holder.method.setVisibility(View.GONE);
 			holder.contacted.setText(R.string.never);
 		}
-		
-		return view;
 	}
 	
-	
-	private void setContactImage(ViewHolder holder, Contact contact) {
-		
-		if (holder.task != null) holder.task.cancel(true);
-		holder.contactUri = contact.id;
-		
-		Bitmap bitmap = mCache.getBitmapFromMemCache(contact.id);
-		if (bitmap == null) {
-			holder.badge.setImageResource(R.drawable.ic_contact_picture);
-			holder.task = new LoadPicTask(contact, holder, getContext(), contact.id, mCache);
-			holder.task.execute();
-		} else {
-			holder.badge.setImageBitmap(bitmap);
-		}
-		
-
+	private void setupLatestContact(ViewHolder holder) {
+		holder.title.setText(R.string.contact_least_recently);
+		holder.name.setText(R.string.contact_least_recently_name);
+		holder.direction.setVisibility(View.GONE);
+		holder.method.setText(R.string.contact_least_recently_text);
+		holder.contacted.setText(R.string.contact_least_recently_subtext);
 	}
 	
 	private static class LoadPicTask extends AsyncTask<Void, Void, Bitmap>{

@@ -25,14 +25,14 @@ public class ContactsData {
 
 	List<Contact> contacts;
 	
-	public void update(Activity context) {
+	public void update(Context context) {
 		Log.d("Contacts", "************************************ Starting run...");
 		long start = System.currentTimeMillis();
 		this.contacts = gatherData(context, contacts);
 		Log.d("Contacts", "************************************ Finishing contacts. elapsed time: "+(System.currentTimeMillis()-start));
 	}
 	
-	public List<Contact> gatherData(Activity context, List<Contact> contacts) {
+	public List<Contact> gatherData(Context context, List<Contact> contacts) {
 		  long start = System.currentTimeMillis();
 		if (contacts == null) contacts = getContacts(context);
 		  Log.d("Contacts", "********* contactsmap1.elapsed time: "+(System.currentTimeMillis()-start));

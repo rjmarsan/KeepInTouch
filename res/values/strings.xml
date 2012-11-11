@@ -29,6 +29,10 @@
     <string name="phone_call_short">phone call</string>
     
     
+    <string name="contact_least_recently">Least Recently</string>
+    <string name="contact_least_recently_name">Contact</string>
+    <string name="contact_least_recently_text">contacted</string>
+    <string name="contact_least_recently_subtext">(updated hourly)</string>
     
     
     <string name="error_sms">Error scanning SMS</string>

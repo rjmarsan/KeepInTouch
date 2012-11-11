@@ -63,10 +63,15 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		Contact contact = contactsAdapter.getItem(arg2);
 		Log.d("ConfigureActivity", "Selected :" + contact);
+		
+		Contact drawcontact = contact;
+		if (contact.isPlaceholderForLatest) {
+			 drawcontact = RecentContactWidgetProvider.getLeastRecentContact(this);
+		}
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
 		//appWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, 0);
-		RemoteViews remoteViews = RecentContactWidgetProvider.setupRemoteViews(this, contact, appWidgetManager.getAppWidgetInfo(mAppWidgetId).initialLayout, mAppWidgetId);
+		RemoteViews remoteViews = RecentContactWidgetProvider.setupRemoteViews(this, drawcontact, appWidgetManager.getAppWidgetInfo(mAppWidgetId).initialLayout, mAppWidgetId);
 		appWidgetManager.updateAppWidget(mAppWidgetId, remoteViews);
 		
 		RecentContactWidgetProvider.scheduleUpdate(this);
@@ -92,8 +97,16 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 		@Override
 		protected void onPostExecute(ContactsData d){
 			data = d;
+			contactsAdapter.add(getPlaceholder());
 	        contactsAdapter.addAll(data.getFavoriteContacts());
 		}
+    }
+    
+    
+    private Contact getPlaceholder() {
+    	Contact c = new Contact();
+    	c.isPlaceholderForLatest = true;
+    	return c;
     }
     
 

@@ -2,6 +2,7 @@ package com.rnm.keepintouch;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.ocpsoft.pretty.time.PrettyTime;
@@ -73,9 +74,12 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		 Contact contact = ContactPersist.getContact(context, widgetId+"");
 		 Log.d(TAG, "Contact: "+contact);
 		 if (contact != null) {
-			 ContactsData data = new ContactsData();
-			 data.updateContact(context, contact);
-			 
+			 if (contact.isPlaceholderForLatest) {
+				 contact = getLeastRecentContact(context);
+			 } else {
+				 ContactsData data = new ContactsData();
+				 data.updateContact(context, contact);
+			 }
 			 
 			 RemoteViews remoteViews = setupRemoteViews(context, contact, size, widgetId);
 			 //ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
@@ -147,6 +151,17 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		remoteViews.setOnClickPendingIntent(R.id.contacted_badge_box, appIntent);
 
 		return remoteViews;
+	}
+	
+	
+	public static Contact getLeastRecentContact(Context context) {
+		 ContactsData data = new ContactsData();
+		 data.update(context);
+		 List<Contact> favorites = data.getFavoriteContacts();
+		 if (favorites.size() > 0)
+			 return favorites.get(0);
+		 else
+			 return null;
 	}
 	
 	

@@ -12,10 +12,10 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
+import android.content.ContentProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.provider.ContactsContract.QuickContact;
@@ -74,14 +74,15 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		 Contact contact = ContactPersist.getContact(context, widgetId+"");
 		 Log.d(TAG, "Contact: "+contact);
 		 if (contact != null) {
+			 Contact drawcontact = contact;
 			 if (contact.isPlaceholderForLatest) {
-				 contact = getLeastRecentContact(context);
+				 drawcontact = getLeastRecentContact(context);
 			 } else {
 				 ContactsData data = new ContactsData();
 				 data.updateContact(context, contact);
 			 }
 			 
-			 RemoteViews remoteViews = setupRemoteViews(context, contact, size, widgetId);
+			 RemoteViews remoteViews = setupRemoteViews(context, drawcontact, size, widgetId);
 			 //ContactPersist.putContact(context, contact, widgetId+""); //save it for later?
 		      
 		      return remoteViews;
@@ -172,16 +173,16 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		
 		if (intent.getAction().equals(UPDATE_CUSTOM)) {
 		 	Log.d(TAG, "on Scheduling Update!");
-			ComponentName provider = new ComponentName(context, RecentContactWidgetProvider.class);
 			AppWidgetManager manager = AppWidgetManager.getInstance(context);
-			int[] ids = manager.getAppWidgetIds(provider);
-			for (int widgetId : ids) {
-				RemoteViews views = updateId(context, widgetId, manager.getAppWidgetInfo(widgetId).initialLayout);
-				if (views != null)
-					manager.updateAppWidget(widgetId, views);
-			}
+
+			updateComponent(context, intent, new ComponentName(context, RecentContactWidgetProvider.class), manager);
+			updateComponent(context, intent, new ComponentName(context, MediumWidget.class), manager);
+			updateComponent(context, intent, new ComponentName(context, SmallWidget.class), manager);
+			
 			Set<String> ok = new HashSet<String>();
-			for (int i : ids) ok.add(i+"");
+			for (int i : manager.getAppWidgetIds(new ComponentName(context, RecentContactWidgetProvider.class))) ok.add(i+"");
+			for (int i : manager.getAppWidgetIds(new ComponentName(context, MediumWidget.class))) ok.add(i+"");
+			for (int i : manager.getAppWidgetIds(new ComponentName(context, SmallWidget.class))) ok.add(i+"");
 			ContactPersist.clearAll(context, ok);
 			scheduleUpdate(context);
 		} else if (intent.getAction().equals(ACTION_CLICKED)) {
@@ -190,5 +191,15 @@ public class RecentContactWidgetProvider extends AppWidgetProvider {
 		}
 
 		
+	}
+	
+	
+	public void updateComponent(Context context, Intent intent, ComponentName provider, AppWidgetManager manager) {
+		int[] ids = manager.getAppWidgetIds(provider);
+		for (int widgetId : ids) {
+			RemoteViews views = updateId(context, widgetId, manager.getAppWidgetInfo(widgetId).initialLayout);
+			if (views != null)
+				manager.updateAppWidget(widgetId, views);
+		}
 	}
 }

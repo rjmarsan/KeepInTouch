@@ -1,6 +1,7 @@
 package com.rnm.keepintouch.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -18,11 +19,21 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.rnm.keepintouch.ErrorDialog;
 import com.rnm.keepintouch.R;
 import com.rnm.keepintouch.data.ContactEvent.TYPE;
+import com.rnm.keepintouch.data.ContactsData.QueryException.QueryError;
 
 public class ContactsData {
-
+	public static class QueryException extends Exception {
+		public Exception wrappedexception;
+		public String message;
+		public enum QueryError {
+			SMS, PHONE
+		}
+		public QueryError type;
+	}
+	
 	List<Contact> contacts;
 	
 	public void update(Context context) {
@@ -47,16 +58,12 @@ public class ContactsData {
 		
 		  Log.d("Contacts", "********* calllog.     elapsed time: "+(System.currentTimeMillis()-start));
 		  start = System.currentTimeMillis();
-//		try {
 		try {  
 			updateSMSIntoList(context, contacts);
-		} catch (Exception e) {
-			showToast(context, R.string.error_sms);
+		} catch (QueryException e) {
+			//showToast(context, R.string.error_sms);
+			showErrorDialog(context, e);
 		}
-
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 		  Log.d("Contacts", "********* smslist.     elapsed time: "+(System.currentTimeMillis()-start));
 		return contacts;
 	}
@@ -72,7 +79,7 @@ public class ContactsData {
 		
 		try {
 			updateSMSForContact(context, contact);
-		} catch (Exception e) {
+		} catch (QueryException e) {
 			showToast(context, R.string.error_sms);
 		}
 
@@ -88,6 +95,15 @@ public class ContactsData {
 			}});
 		}
 		Log.e("Contacts", "Error: "+message);
+	}
+	private void showErrorDialog(final Context context, final QueryException e) {
+		if (context instanceof Activity) {
+			((Activity)context).runOnUiThread(new Runnable() { public void run() {
+				ErrorDialog.show(context, e);
+			}});
+		}
+		Log.e("Contacts", "DIALOG Error: "+e.message);
+		e.wrappedexception.printStackTrace();
 	}
 	
 	
@@ -227,47 +243,64 @@ public class ContactsData {
         }	
 	}
 	
-	private void updateSMSIntoList(Context context, List<Contact> contacts) {
+	private void updateSMSIntoList(Context context, List<Contact> contacts) throws QueryException {
 		for (Contact contact: contacts)
 				updateSMSForContact(context, contact);
 	}
-	private void updateSMSForContact(Context context, Contact contact) {
+	private void updateSMSForContact(Context context, Contact contact) throws QueryException {
 		for (String rawid : contact.rawids) 	
 			updateSMSForContact(context, contact, rawid);
 	}
-	private void updateSMSForContact(Context context, Contact contact, String rawid) {
+	private void updateSMSForContact(Context context, Contact contact, String rawid) throws QueryException {
 		Uri uri = Uri.parse("content://sms");
 		Log.d("Contact", "SMSLooking up :"+contact.name+ " with number: ["+rawid+"]");
-		Cursor c = context.getContentResolver().query(uri, new String[] {"MAX(date) as date", "type", "address", "person"}, "person = ?", new String[] {rawid}, null);
-		//Cursor c = context.getContentResolver().query(uri, null, null, null, null);
-
-		if (c.moveToFirst()) {
-			for (int i = 0; i < c.getCount(); i++) {
-//				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
-//				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
-				
-				if (c.getString(c.getColumnIndexOrThrow("date")) != null) {
-					//String body = c.getString(c.getColumnIndexOrThrow("body")).toString();
-					long timestamp = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
-					int type = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("type")).toString());
-					String number = c.getString(c.getColumnIndexOrThrow("address")).toString();
-					ContactEvent event = new ContactEvent();
-					event.type = TYPE.SMS;
-					event.timestamp = timestamp;
-					//event.message = body;
-					event.number = number;
-					event.callType = type;
+		
+		try {
+			Cursor c = context.getContentResolver().query(uri, new String[] {"MAX(date) as date", "type", "address", "person"}, "person = ?", new String[] {rawid}, null);
+			//Cursor c = context.getContentResolver().query(uri, null, null, null, null);
+	
+			if (c.moveToFirst()) {
+				for (int i = 0; i < c.getCount(); i++) {
+	//				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
+	//				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
 					
-					contact.contactEvents.add(event);
-					if (event.timestamp > contact.lastcontact) {
-						contact.lastcontact = event.timestamp;
+					if (c.getString(c.getColumnIndexOrThrow("date")) != null) {
+						//String body = c.getString(c.getColumnIndexOrThrow("body")).toString();
+						long timestamp = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
+						int type = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("type")).toString());
+						String number = c.getString(c.getColumnIndexOrThrow("address")).toString();
+						ContactEvent event = new ContactEvent();
+						event.type = TYPE.SMS;
+						event.timestamp = timestamp;
+						//event.message = body;
+						event.number = number;
+						event.callType = type;
+						
+						contact.contactEvents.add(event);
+						if (event.timestamp > contact.lastcontact) {
+							contact.lastcontact = event.timestamp;
+						}
 					}
+					c.moveToNext();
+	
 				}
-				c.moveToNext();
-
 			}
+			c.close();
+		} catch (Exception e) {
+			String message="";
+			
+			Cursor c = context.getContentResolver().query(uri, null, null, null, null);
+			if (c.moveToFirst()) {
+				message="rows: "+Arrays.toString(c.getColumnNames());
+				c.close();
+			}
+			
+			QueryException queryexception = new QueryException();
+			queryexception.message = message;
+			queryexception.wrappedexception = e;
+			queryexception.type = QueryError.SMS;
+			throw queryexception;
 		}
-		c.close();
 	}
 
 }

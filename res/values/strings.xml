@@ -1,5 +1,7 @@
 <resources>
+    <string name="our_email">support@rj.io</string>
 
+    
     <string name="app_name">In Touch</string>
     <string name="title_section3">Recent</string>
     <string name="title_section2">Favorites</string>
@@ -37,4 +39,13 @@
     
     <string name="error_sms">Error scanning SMS</string>
     <string name="error_calllog">Error scanning Call Log</string>
+    <string name="error_dialog_email">Email</string>
+    <string name="error_dialog_cancel">Cancel</string>
+    <string name="error_sms_dialog_title">SMS Scanning Issues</string>
+    <string name="error_sms_dialog_text">There were some issues scanning through your SMS database.\nIn order to help us fix the problem, would you mind emailing us some info about it?\n(error logs will be automatically attached)</string>
+    <string name="error_phone_dialog_title">Call Log Scanning Issues</string>
+    <string name="error_phone_dialog_text">There were some issues scanning through your Call Log database.\nIn order to help us fix the problem, would you mind emailing us some info about it? (error logs will be automatically attached)</string>
+    <string name="error_email_title">In Touch - Scanning Error</string>
+    <string name="error_email_message">\n\nPhone: %1$s\n\nOS:%2$s\n\nError Message:\n%3$s\n\nStack Trace:\n%4$s</string>
+    <string name="error_email_picker">Send Error Email</string>
 </resources>

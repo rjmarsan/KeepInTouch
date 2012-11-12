@@ -51,8 +51,9 @@ public class ContactsData {
 		  
 		try {
 			updateCallLogIntoList(context, contacts);
-		} catch (Exception e) {
-			showToast(context, R.string.error_calllog);
+		} catch (QueryException e) {
+			//showToast(context, R.string.error_phone);
+			showErrorDialog(context, e);
 		}
 
 		
@@ -191,15 +192,15 @@ public class ContactsData {
 	
 	
 	
-	private void updateCallLogIntoList(Context context, List<Contact> contacts) {
+	private void updateCallLogIntoList(Context context, List<Contact> contacts) throws QueryException {
 		for (Contact contact : contacts) 
 			updateCallLogForContact(context, contact);
 	}
-	private void updateCallLogForContact(Context context, Contact contact) {
+	private void updateCallLogForContact(Context context, Contact contact) throws QueryException {
 		for (String number : contact.normphonenumber)
 			updateCallLogForContact(context, contact, number);
 	}
-	private void updateCallLogForContact(Context context, Contact contact, String number) {
+	private void updateCallLogForContact(Context context, Contact contact, String number) throws QueryException {
 		if (number == null) return; //nothing to do.
 		/**
 		 * http://malsandroid.blogspot.com/2010/06/accessing-call-logs.html
@@ -208,39 +209,54 @@ public class ContactsData {
 
 		
 		Log.d("Contact", "Looking up :"+contact.name+ " with number: "+number);
-		
-		Cursor c = context.getContentResolver().query(allCalls, 
-        		new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION, "normalized_number"}/*null*/,
-        		"normalized_number = ?", new String[] {number}, null);
-        		/*"normalized_number = ?", new String[] {number}, null);*/
-        if (c.moveToFirst()) {
-           do {
-//				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
-//				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
-//				Log.d("Contacts", "     "+CallLog.Calls._ID+": "+c.getString(c.getColumnIndex(CallLog.Calls._ID)));
-				
-               String num = c.getString(c.getColumnIndex(CallLog.Calls.NUMBER));
-               long timestamp  = Long.parseLong(c.getString(c.getColumnIndex(CallLog.Calls.DATE)));
-               int type = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.TYPE)));
-               int duration = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.DURATION)));
-
-               final int CALL_DURATION_THRESH = 1;
-               //Only log a call if it's not a missed call, and it's a certain duration.
-               if (duration >= CALL_DURATION_THRESH && type != CallLog.Calls.MISSED_TYPE) {
-	               
-	               ContactEvent event = new ContactEvent();
-	               event.type = TYPE.CALL;
-	               event.timestamp = timestamp;
-	               event.callType = type;
-	               event.number = num;
-	               
-	               contact.contactEvents.add(event);
-	               if (event.timestamp > contact.lastcontact) {
-	            	   contact.lastcontact = event.timestamp;
+		try {
+			Cursor c = context.getContentResolver().query(allCalls, 
+	        		new String[] {CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.DURATION, "normalized_number"}/*null*/,
+	        		"normalized_number = ?", new String[] {number}, null);
+	        		/*"normalized_number = ?", new String[] {number}, null);*/
+	        if (c.moveToFirst()) {
+	           do {
+	//				Log.d("Contacts", "row: "+Arrays.toString(c.getColumnNames()));
+	//				for (String s : c.getColumnNames()) Log.d("Contacts", "     "+s+": "+c.getString(c.getColumnIndex(s)));
+	//				Log.d("Contacts", "     "+CallLog.Calls._ID+": "+c.getString(c.getColumnIndex(CallLog.Calls._ID)));
+					
+	               String num = c.getString(c.getColumnIndex(CallLog.Calls.NUMBER));
+	               long timestamp  = Long.parseLong(c.getString(c.getColumnIndex(CallLog.Calls.DATE)));
+	               int type = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.TYPE)));
+	               int duration = Integer.parseInt(c.getString(c.getColumnIndex(CallLog.Calls.DURATION)));
+	
+	               final int CALL_DURATION_THRESH = 1;
+	               //Only log a call if it's not a missed call, and it's a certain duration.
+	               if (duration >= CALL_DURATION_THRESH && type != CallLog.Calls.MISSED_TYPE) {
+		               
+		               ContactEvent event = new ContactEvent();
+		               event.type = TYPE.CALL;
+		               event.timestamp = timestamp;
+		               event.callType = type;
+		               event.number = num;
+		               
+		               contact.contactEvents.add(event);
+		               if (event.timestamp > contact.lastcontact) {
+		            	   contact.lastcontact = event.timestamp;
+		               }
 	               }
-               }
-           } while (c.moveToNext());
-        }	
+	           } while (c.moveToNext());
+	        }
+		} catch (Exception e) {
+			String message="";
+			
+			Cursor c = context.getContentResolver().query(allCalls, null, null, null, null);
+			if (c.moveToFirst()) {
+				message="rows: "+Arrays.toString(c.getColumnNames());
+				c.close();
+			}
+			
+			QueryException queryexception = new QueryException();
+			queryexception.message = message;
+			queryexception.wrappedexception = e;
+			queryexception.type = QueryError.PHONE;
+			throw queryexception;
+		}
 	}
 	
 	private void updateSMSIntoList(Context context, List<Contact> contacts) throws QueryException {

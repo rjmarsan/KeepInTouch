@@ -37,6 +37,9 @@
     <string name="contact_least_recently_subtext">(updated hourly)</string>
     
     
+    <string name="error_widget_no_favorites">Can\'t create widget - no starred contacts</string>
+    
+    
     <string name="error_sms">Error scanning SMS</string>
     <string name="error_calllog">Error scanning Call Log</string>
     <string name="error_dialog_email">Email</string>

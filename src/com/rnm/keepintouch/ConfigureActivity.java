@@ -16,6 +16,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.rnm.keepintouch.data.Contact;
 import com.rnm.keepintouch.data.ContactPersist;
@@ -97,11 +98,19 @@ public class ConfigureActivity extends Activity implements OnItemClickListener {
 		@Override
 		protected void onPostExecute(ContactsData d){
 			data = d;
+			List<Contact> favs = data.getFavoriteContacts();
 			contactsAdapter.add(getPlaceholder());
-	        contactsAdapter.addAll(data.getFavoriteContacts());
+	        contactsAdapter.addAll(favs);
+	        if (favs.size() == 0) {
+	        	finishAndToast();
+	        }
 		}
     }
     
+    private void finishAndToast() {
+    	Toast.makeText(this, R.string.error_widget_no_favorites, Toast.LENGTH_LONG).show();
+    	finish();
+    }
     
     private Contact getPlaceholder() {
     	Contact c = new Contact();

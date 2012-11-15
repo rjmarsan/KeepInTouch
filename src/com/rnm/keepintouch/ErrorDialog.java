@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.util.Log;
 
@@ -40,8 +42,16 @@ public class ErrorDialog {
 		String title = context.getString(R.string.error_email_title);
 		String device = "Manufactuer: "+Build.MANUFACTURER+" Brand: "+Build.BRAND+" Model: "+Build.MODEL;
 		String os = "Version: "+Build.VERSION.SDK_INT;
+		PackageInfo info;
+		String appversion = "";
+		try {
+			info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			appversion = "appversion: "+info.versionCode+ "name:"+info.versionName+ " installtime:"+info.firstInstallTime;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
 		String error = Log.getStackTraceString(exception.wrappedexception);
-		String message = context.getString(R.string.error_email_message, device, os, exception.message, error);
+		String message = context.getString(R.string.error_email_message, device, os, appversion, exception.message, error);
 		sendEmail(context, title, message);
 	}
 

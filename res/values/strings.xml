@@ -2,17 +2,17 @@
     <string name="our_email">support@rj.io</string>
 
     
-    <string name="app_name">In Touch</string>
+    <string name="app_name">in Touch</string>
     <string name="title_section3">Recent</string>
     <string name="title_section2">Favorites</string>
     <string name="title_section1">Alphabetical</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">Keep In Touch</string>
+    <string name="title_activity_main">in Touch</string>
     <string name="no_fav_string">Looks like you don\'t have any favorite contacts, why don\'t you try adding some?</string>
 
-    <string name="widget_large">In Touch</string>
-    <string name="widget_medium">In Touch - Medium</string>
-    <string name="widget_small">In Touch - Small</string>
+    <string name="widget_large">in Touch</string>
+    <string name="widget_medium">in Touch - Medium</string>
+    <string name="widget_small">in Touch - Small</string>
     <string-array name="size_settings">
         <item >Small</item>
         <item >Medium</item>
@@ -42,13 +42,13 @@
     
     <string name="error_sms">Error scanning SMS</string>
     <string name="error_calllog">Error scanning Call Log</string>
-    <string name="error_dialog_email">Email</string>
+    <string name="error_dialog_email">Report</string>
     <string name="error_dialog_cancel">Cancel</string>
-    <string name="error_sms_dialog_title">SMS Scanning Issues</string>
-    <string name="error_sms_dialog_text">There were some issues scanning through your SMS database.\nIn order to help us fix the problem, would you mind emailing us some info about it?\n(error logs will be automatically attached)</string>
-    <string name="error_phone_dialog_title">Call Log Scanning Issues</string>
-    <string name="error_phone_dialog_text">There were some issues scanning through your Call Log database.\nIn order to help us fix the problem, would you mind emailing us some info about it? (error logs will be automatically attached)</string>
-    <string name="error_email_title">In Touch - Scanning Error</string>
-    <string name="error_email_message">\n\nPhone: %1$s\n\nOS:%2$s\n\nError Message:\n%3$s\n\nStack Trace:\n%4$s</string>
+    <string name="error_sms_dialog_title">Your contacts are inaccessible.</string>
+    <string name="error_sms_dialog_text">Do you want to report the problem?</string>
+    <string name="error_phone_dialog_title">Your contacts are inaccessible.</string>
+    <string name="error_phone_dialog_text">Do you want to report the problem?</string>
+    <string name="error_email_title">in Touch - Scanning Error</string>
+    <string name="error_email_message">\n\nPhone: %1$s\n\nOS:%2$s\n\nApp:%3$s\n\nError Message:\n%4$s\n\nStack Trace:\n%5$s</string>
     <string name="error_email_picker">Send Error Email</string>
 </resources>
